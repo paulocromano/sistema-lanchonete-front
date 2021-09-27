@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+
 import { ServidorService } from 'src/app/shared/service/servidor.service';
 import { ClienteFORM } from '../model/cliente.form';
 import { Cliente } from '../model/cliente.model';
@@ -10,7 +11,7 @@ import { Cliente } from '../model/cliente.model';
 })
 export class ClienteService {
 
-  private baseUrl: string = `${this.servidorService.getUrlServidorBackEnd()}/cliente`;
+  private readonly baseUrl: string = `${this.servidorService.urlServidorBackEnd}/cliente`;
 
   constructor(private http: HttpClient, private servidorService: ServidorService) { }
 

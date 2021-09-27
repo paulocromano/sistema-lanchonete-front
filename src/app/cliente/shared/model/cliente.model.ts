@@ -6,5 +6,6 @@ export class Cliente {
     nome: string;
     telefone: string;
     telefoneRecado: string;
-    endereco: Endereco;
+    dataCadastro: Date;
+    endereco: Endereco = new Endereco();
 }

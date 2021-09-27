@@ -5,5 +5,5 @@ export class ClienteFORM {
     nome: string;
     telefone: string;
     telefoneRecado: string;
-    endereco: EnderecoFORM;
+    endereco: EnderecoFORM = new EnderecoFORM();
 }

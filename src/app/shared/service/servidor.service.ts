@@ -5,12 +5,8 @@ import { Injectable } from '@angular/core';
 })
 export class ServidorService {
 
-  private urlServidorBackEnd: string = 'http://localhost:8080';
+  public readonly urlServidorBackEnd: string = 'http://localhost:8080';
 
   constructor() { }
 
-
-  public getUrlServidorBackEnd(): string {
-    return this.urlServidorBackEnd;
-  }
 }

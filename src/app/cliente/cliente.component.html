@@ -1,1 +1,228 @@
-<p>cliente!</p>
+<div class="container-fluid mt-5">
+    <h3 class="text-center">Clientes</h3>
+
+    <div class="borda-table mt-3">
+        <p-table #dataView [value]="clientes" [columns]="colunasTabela" [responsive]="true" 
+            [rows]="8" [paginator]="true" class="text-center">
+
+            <ng-template pTemplate="caption">
+                <div class="row">
+                    <div class="col-12 col-sm-6 col-md-6 col-lg-4">
+                        <input type="text" pInputText placeholder="Pesquisa" class="pesquisa" [(ngModel)]="inputPesquisa"
+                            (input)="dataView.filterGlobal($event.target.value, 'contains')">
+                        <i class="fas fa-search" style="font-size: 1.18em;"></i>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-md-6 col-lg-8 text-right">
+                        <button class="btn btn-success px-5" (click)="exibirDialogCadastro()">
+                            <i class="fas fa-plus"></i>
+                            Cadastrar Cliente
+                        </button>
+                    </div>
+                </div>
+            </ng-template>
+
+            <ng-template pTemplate="header" let-colunas>
+                <tr>
+                    <th *ngFor="let coluna of colunas" [pSortableColumn]="coluna.field" [ngClass]="coluna.style" class="text-center">
+                        {{ coluna.header }}
+                        <p-sortIcon *ngIf="coluna.header === 'Data do Cadastro' || coluna.header === 'Nome'" [field]="coluna.field" 
+                            ariaLabel="active to sort"
+                            ariaLabelDesc="Activate to sort in descending order"
+                            ariaLabelAsc="Activate to sort in ascending order">
+                        </p-sortIcon>
+                    </th>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-cliente>
+                <tr>
+                    <td *ngFor="let coluna of colunasTabela" class="text-center">
+                        <span class="ui-column-title text-left">
+                            {{ coluna.field === 'dataCadastro' ? formatarDataCadastroCliente(cliente[coluna.field]) 
+                                : cliente[coluna.field] }}
+                        </span>
+                        
+                        <span *ngIf="coluna.header === 'Ações'">
+                            <button class="btn btn-info mr-2 px-3" pTooltip="Informações" tooltipPosition="bottom"
+                                (click)="armazenarClienteParaVisualizarInformacoes(cliente)">
+                                <i class="fas fa-info text-light"></i>
+                            </button>
+
+                            <button class="btn btn-warning" pTooltip="Editar" tooltipPosition="bottom"
+                                (click)="armazenarClienteParaEdicao(cliente)">
+                                <i class="fas fa-pen text-light"></i>
+                            </button>
+
+                            <button class="btn btn-danger ml-2" pTooltip="Excluir" tooltipPosition="bottom"
+                                (click)="armazenarClienteParaExclusao(cliente)">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </span>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage" class="text-center" let-clientes>
+                <tr>
+                    <td [attr.colspan]="clientes.length" class="text-center">
+                        <span *ngIf="!processandoOperacaoListagem">
+                            {{ inputPesquisa ? 'Nenhum cliente corresponde à pesquisa!' : 'Nenhum cliente encontrado!' }}
+                        </span>
+
+                        <span *ngIf="processandoOperacaoListagem && !inputPesquisa">
+                            <p-progressSpinner strokeWidth="3"></p-progressSpinner>
+                        </span>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="summary">
+                Clientes encontrados: {{ clientes ? clientes.length : 0 }}
+            </ng-template>
+        </p-table>
+    </div>
+</div>
+
+<!-- Dialog cadastro de Cliente -->
+<p-dialog [visible]="abrirDialogCadastro" [modal]="true" [blockScroll]="true" 
+    [draggable]="false" [closable]="false" [style]="{width: '70vw'}">
+
+    <p-header>Cadastro de Cliente</p-header>
+
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <div class="col-12 col-md-6">
+                <span class="p-float-label">
+                    <input type="text" style="width: 100%;" maxlength="100" [(ngModel)]="formularioCliente.nome" pInputText> 
+                    <label for="inputtext">Nome Completo</label>
+                </span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12 col-md-6 mt-4">
+                <span class="p-float-label">
+                    <input type="text" style="width: 160px;" [(ngModel)]="formularioCliente.telefone"
+                        [dropSpecialCharacters]="false" mask="(00) 0000-0000||(00) 00000-0000" pInputText> 
+                    <label for="inputtext">Telefone</label>
+                </span>
+            </div>
+            <div class="col-12 col-md-6 mt-4">
+                <span class="p-float-label">
+                    <input type="text" style="width: 160px;" [(ngModel)]="formularioCliente.telefoneRecado" 
+                        [dropSpecialCharacters]="false" mask="(00) 0000-0000||(00) 00000-0000" pInputText> 
+                    <label for="inputtext">Telefone p/ Recado</label>
+                </span>
+            </div>
+        </div>
+        <hr>
+
+        <h5 class="mt-3">Endereço</h5>
+        <div class="mt-4">
+            <span class="p-float-label">
+                <input type="text" style="width: 150px;" [(ngModel)]="formularioCliente.endereco.cep"
+                    [dropSpecialCharacters]="false" mask="00000-000" [disabled]="processandoBuscaCep"
+                    (ngModelChange)="buscarEnderecoPeloCEP($event)" pInputText> 
+                <label for="inputtext">CEP</label>
+
+                <span class="mr-1 mt-1">
+                    <i [ngClass]="{'fas fa-spin fa-circle-notch' : processandoBuscaCep}"></i>
+                </span>
+            </span>
+        </div>
+
+        <div class="row">
+            <div class="col-12 col-md-8 mt-4">
+                <span class="p-float-label">
+                    <input type="text" style="width: 100%;" [(ngModel)]="formularioCliente.endereco.logradouro" pInputText> 
+                    <label for="inputtext">Logradouro</label>
+                </span>
+            </div>
+            <div class="col-12 col-md-4 mt-4">
+                <span class="p-float-label">
+                    <input type="text" style="width: 100px;" [(ngModel)]="formularioCliente.endereco.numero" pInputText> 
+                    <label for="inputtext">Número</label>
+                </span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12 col-md-6 mt-4">
+                <span class="p-float-label">
+                    <input type="text" style="width: 100%;" [(ngModel)]="formularioCliente.endereco.complemento" pInputText> 
+                    <label for="inputtext">Complemento</label>
+                </span>
+            </div>
+            <div class="col-12 col-md-4 mt-4">
+                <span class="p-float-label">
+                    <input type="text" style="width: 100%;" [(ngModel)]="formularioCliente.endereco.bairro" pInputText> 
+                    <label for="inputtext">Bairro</label>
+                </span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12 col-md-6 mt-4">
+                <span class="p-float-label">
+                    <input type="text" style="width: 100%;" [(ngModel)]="formularioCliente.endereco.cidade" pInputText> 
+                    <label for="inputtext">Cidade</label>
+                </span>
+            </div>
+            <div class="col-12 col-md-6 mt-4">
+                <span class="p-float-label">
+                    <input type="text" style="width: 70px;" [(ngModel)]="formularioCliente.endereco.uf" pInputText> 
+                    <label for="inputtext">UF</label>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <p-footer>
+        <button class="btn btn-danger" (click)="fecharDialogCadastroCliente()">
+            <i class="fas fa-arrow-circle-left"></i>
+            Voltar
+        </button>
+
+        <button class="btn btn-success" [disabled]="desabilitarBotaoCadastroCliente()" 
+        (click)="cadastrarCliente()">
+        <i class="fas " [ngClass]="processandoCadastroCliente ? 'fa-spin fa-circle-notch' : 'fa-check-circle'"></i>
+        Confirmar
+    </button>
+    </p-footer>
+</p-dialog>
+
+<!-- Dialog informações sobre o Cliente -->
+<p-dialog [visible]="abrirDialogInformacoesCliente" [modal]="true" [blockScroll]="true" 
+    [draggable]="false" [closable]="false" [style]="{width: '40vw'}">
+
+    <p-header>Informações do(a) Cliente</p-header>
+
+    <div class="container-fluid">
+        <div><b>Nome: </b>{{ clienteSelecionado.nome }}</div>
+        <div><b>Telefone: </b>{{ clienteSelecionado.telefone }}</div>
+        <div><b>Telefone para Recado: </b>{{ clienteSelecionado.telefoneRecado }}</div>
+        <div><b>Cadastro Realizado em: </b>
+            {{ formatarDataCadastroCliente(clienteSelecionado.dataCadastro) }}
+        </div>
+        <hr>
+
+        <h5>Endereço</h5>
+        <div><b>Logradouro: </b>{{ clienteSelecionado.endereco.logradouro }}</div>
+        <div><b>Número: </b>{{ clienteSelecionado.endereco.numero }}</div>
+        <div *ngIf="clienteSelecionado.endereco.complemento">
+            <b>Complemento: </b>{{ clienteSelecionado.endereco.complemento }}
+        </div>
+        <div><b>Bairro: </b>{{ clienteSelecionado.endereco.bairro }}</div>
+        <div><b>Cidade: </b>{{ clienteSelecionado.endereco.cidade}}</div>
+        <div><b>UF: </b>{{ clienteSelecionado.endereco.uf }}</div>
+        <div><b>CEP: </b>{{ clienteSelecionado.endereco.cep }}</div>
+    </div>
+
+    <p-footer>
+        <button class="btn btn-danger" (click)="fecharDialogInformacoes()">
+            <i class="fas fa-arrow-circle-left"></i>
+            Voltar
+        </button>
+    </p-footer>
+</p-dialog>
