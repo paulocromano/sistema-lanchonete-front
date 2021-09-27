@@ -85,10 +85,10 @@
 </div>
 
 <!-- Dialog cadastro de Cliente -->
-<p-dialog [visible]="abrirDialogCadastro" [modal]="true" [blockScroll]="true" 
+<p-dialog [visible]="abrirDialogCadastro || abrirDialogEdicaoCliente" [modal]="true" [blockScroll]="true" 
     [draggable]="false" [closable]="false" [style]="{width: '70vw'}">
 
-    <p-header>Cadastro de Cliente</p-header>
+    <p-header>{{ abrirDialogCadastro ? 'Cadastro de Cliente' : 'Alteração dos Dados do(a) Cliente' }}</p-header>
 
     <div class="container-fluid mt-4">
         <div class="row">
@@ -179,16 +179,16 @@
     </div>
 
     <p-footer>
-        <button class="btn btn-danger" (click)="fecharDialogCadastroCliente()">
+        <button class="btn btn-danger" (click)="fecharDialogCadastroEdicaoCliente()">
             <i class="fas fa-arrow-circle-left"></i>
             Voltar
         </button>
 
-        <button class="btn btn-success" [disabled]="desabilitarBotaoCadastroCliente()" 
-        (click)="cadastrarCliente()">
-        <i class="fas " [ngClass]="processandoCadastroCliente ? 'fa-spin fa-circle-notch' : 'fa-check-circle'"></i>
-        Confirmar
-    </button>
+        <button class="btn btn-success" [disabled]="desabilitarBotaoCadastroEdicaoCliente()" 
+            (click)="cadastrarEditarCliente()">
+            <i class="fas " [ngClass]="processandoCadastroEdicaoCliente ? 'fa-spin fa-circle-notch' : 'fa-check-circle'"></i>
+            Confirmar
+        </button>
     </p-footer>
 </p-dialog>
 
@@ -223,6 +223,27 @@
         <button class="btn btn-danger" (click)="fecharDialogInformacoes()">
             <i class="fas fa-arrow-circle-left"></i>
             Voltar
+        </button>
+    </p-footer>
+</p-dialog>
+
+<!-- Dialog informações sobre o Cliente -->
+<p-dialog [visible]="abrirDialogExclusaoCliente" [modal]="true" [blockScroll]="true" 
+    [draggable]="false" [closable]="false" [style]="{width: '30vw'}">
+
+    <p-header>Excluir Cliente</p-header>
+
+    <div>Deseja excluir o(a) cliente <b>{{ clienteSelecionado.nome }}</b>?</div>
+
+    <p-footer>
+        <button class="btn btn-danger" (click)="fecharDialogExclusao()">
+            <i class="fas fa-arrow-circle-left"></i>
+            Voltar
+        </button>
+        <button class="btn btn-success" [disabled]="processandoExclusaoCliente" 
+            (click)="excluirCliente()">
+            <i class="fas " [ngClass]="processandoExclusaoCliente ? 'fa-spin fa-circle-notch' : 'fa-check-circle'"></i>
+            Confirmar
         </button>
     </p-footer>
 </p-dialog>

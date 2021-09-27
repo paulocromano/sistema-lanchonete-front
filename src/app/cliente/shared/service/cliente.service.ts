@@ -23,7 +23,11 @@ export class ClienteService {
     return this.http.post(this.baseUrl, formularioCliente);
   }
 
+  public alterarDadosCliente(id: number, formularioCliente: ClienteFORM): Observable<any> {
+    return this.http.put(`${this.baseUrl}/alterar/${id}`, formularioCliente);
+  }
+
   public excluirCliente(id: number): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/${id}`);
+    return this.http.delete(`${this.baseUrl}/excluir/${id}`);
   }
 }
