@@ -10,12 +10,12 @@ import { TooltipModule } from 'primeng/tooltip';
 
 import { IConfig, NgxMaskModule } from 'ngx-mask';
 
-import { ClienteComponent } from './cliente.component';
+import { FornecedorComponent } from './fornecedor.component';
 
 const maskConfig: Partial<IConfig> = { validation: false }
 
 @NgModule({
-  declarations: [ ClienteComponent ],
+  declarations: [ FornecedorComponent ],
   imports: [
     CommonModule,
     FormsModule,
@@ -27,4 +27,4 @@ const maskConfig: Partial<IConfig> = { validation: false }
     NgxMaskModule.forRoot(maskConfig)
   ]
 })
-export class ClienteModule { }
+export class FornecedorModule { }

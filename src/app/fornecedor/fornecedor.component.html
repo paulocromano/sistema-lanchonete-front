@@ -1,0 +1,140 @@
+<div class="container-fluid mt-5">
+    <h2 class="text-center">Fornecedores</h2>
+
+    <div class="borda-table mt-3">
+        <p-table #dataView [value]="fornecedores" [columns]="colunasTabela" [responsive]="true" 
+            [rows]="8" [paginator]="true" class="text-center">
+
+            <ng-template pTemplate="caption">
+                <div class="row">
+                    <div class="col-12 col-sm-6 col-md-6 col-lg-4">
+                        <input type="text" pInputText placeholder="Pesquisa" class="pesquisa" [(ngModel)]="inputPesquisa"
+                            (input)="dataView.filterGlobal($event.target.value, 'contains')">
+                        <i class="fas fa-search" style="font-size: 1.18em;"></i>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-md-6 col-lg-8 text-right">
+                        <button class="btn btn-success px-5" (click)="exibirDialogCadastro()">
+                            <i class="fas fa-plus"></i>
+                            Cadastrar Fornecedor
+                        </button>
+                    </div>
+                </div>
+            </ng-template>
+
+            <ng-template pTemplate="header" let-colunas>
+                <tr>
+                    <th *ngFor="let coluna of colunas" [pSortableColumn]="coluna.field" [ngClass]="coluna.style" class="text-center">
+                        {{ coluna.header }}
+                        <p-sortIcon *ngIf="coluna.header === 'Data do Cadastro' || coluna.header === 'Empresa'" [field]="coluna.field" 
+                            ariaLabel="active to sort"
+                            ariaLabelDesc="Activate to sort in descending order"
+                            ariaLabelAsc="Activate to sort in ascending order">
+                        </p-sortIcon>
+                    </th>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-fornecedor>
+                <tr>
+                    <td *ngFor="let coluna of colunasTabela" class="text-center">
+                        <span class="ui-column-title text-left">
+                            {{ coluna.field === 'dataCadastro' ? formatarDataCadastroFornecedor(fornecedor[coluna.field]) 
+                                : fornecedor[coluna.field] }}
+                        </span>
+                        
+                        <span *ngIf="coluna.header === 'Ações'">
+                            <button class="btn btn-info mr-2 px-3" pTooltip="Informações" tooltipPosition="bottom"
+                                (click)="armazenarFornecedorParaVisualizarInformacoes(fornecedor)">
+                                <i class="fas fa-info text-light"></i>
+                            </button>
+
+                            <button class="btn btn-warning" pTooltip="Editar" tooltipPosition="bottom"
+                                (click)="armazenarFornecedorParaEdicao(fornecedor)">
+                                <i class="fas fa-pen text-light"></i>
+                            </button>
+
+                            <button class="btn btn-danger ml-2" pTooltip="Excluir" tooltipPosition="bottom"
+                                (click)="armazenarFornecedorParaExclusao(fornecedor)">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </span>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage" class="text-center" let-fornecedores>
+                <tr>
+                    <td [attr.colspan]="fornecedores.length" class="text-center">
+                        <span *ngIf="!processandoOperacaoListagem">
+                            {{ inputPesquisa ? 'Nenhum cliente corresponde à pesquisa!' : 'Nenhum cliente encontrado!' }}
+                        </span>
+
+                        <span *ngIf="processandoOperacaoListagem && !inputPesquisa">
+                            <p-progressSpinner strokeWidth="3"></p-progressSpinner>
+                        </span>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="summary">
+                Fornecedores encontrados: {{ fornecedores ? fornecedores.length : 0 }}
+            </ng-template>
+        </p-table>
+    </div>
+</div>
+
+<!-- Dialog cadastro de Cliente -->
+<p-dialog [visible]="abrirDialogCadastro || abrirDialogEdicaoFornecedor" [modal]="true" [blockScroll]="true" 
+    [draggable]="false" [closable]="false" [style]="{width: '70vw'}">
+
+    <p-header>{{ abrirDialogCadastro ? 'Cadastro de Fornecedor' : 'Alteração dos Dados do(a) Fornecedor(a)' }}</p-header>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12 col-md-6 mt-4">
+                <span class="p-float-label">
+                    <input type="text" style="width: 100%;" maxlength="100" [(ngModel)]="formularioFornecedor.nomeEmpresa" pInputText> 
+                    <label for="inputtext">Nome da Empresa</label>
+                </span>
+            </div>
+            <div class="col-12 col-md-6 mt-4">
+                <span class="p-float-label">
+                    <input type="text" style="width: 180px;" [(ngModel)]="formularioFornecedor.cnpj"
+                        [dropSpecialCharacters]="false" mask="00.000.000/0000-00" pInputText> 
+                    <label for="inputtext">CNPJ</label>
+                </span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12 col-md-6 mt-4">
+                <span class="p-float-label">
+                    <input type="text" style="width: 160px;" [(ngModel)]="formularioFornecedor.telefone"
+                        [dropSpecialCharacters]="false" mask="(00) 0000-0000||(00) 00000-0000" pInputText> 
+                    <label for="inputtext">Telefone</label>
+                </span>
+            </div>
+            <div class="col-12 col-md-6 mt-4">
+                <span class="p-float-label">
+                    <input type="text" style="width: 160px;" [(ngModel)]="formularioFornecedor.telefoneAlternativo" 
+                        [dropSpecialCharacters]="false" mask="(00) 0000-0000||(00) 00000-0000" pInputText> 
+                    <label for="inputtext">Telefone Alternativo</label>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <p-footer>
+        <button class="btn btn-danger" (click)="fecharDialogCadastroEdicaoFornecedor()">
+            <i class="fas fa-arrow-circle-left"></i>
+            Voltar
+        </button>
+
+        <button class="btn btn-success" [disabled]="desabilitarBotaoCadastroEdicaoFornecedor()" 
+            (click)="cadastrarEditarFornecedor()">
+            <i class="fas " [ngClass]="processandoCadastroEdicaoFornecedor ? 'fa-spin fa-circle-notch' : 'fa-check-circle'"></i>
+            Confirmar
+        </button>
+    </p-footer>
+</p-dialog>
