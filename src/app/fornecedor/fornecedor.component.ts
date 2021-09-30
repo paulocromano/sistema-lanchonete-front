@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
+
 import { ToastrService } from 'ngx-toastr';
 
 import { FornecedorService } from './shared/service/fornecedor.service';
@@ -83,9 +85,19 @@ export class FornecedorComponent implements OnInit {
   }
 
   public desabilitarBotaoCadastroEdicaoFornecedor(): boolean {
-    return this.processandoCadastroEdicaoFornecedor || !(this.formularioFornecedor
-      && this.formularioFornecedor.nomeEmpresa && this.formularioFornecedor.cnpj
-      && this.formularioFornecedor.telefone);
+    const dadosFormularioEstaoPreenchidos: boolean = this.processandoCadastroEdicaoFornecedor 
+      || !(this.formularioFornecedor && this.formularioFornecedor.nomeEmpresa 
+        && this.formularioFornecedor.cnpj && this.formularioFornecedor.telefone);
+   
+    return this.abrirDialogCadastro ? dadosFormularioEstaoPreenchidos 
+      : dadosFormularioEstaoPreenchidos || !this.dadosFornecedoresSofreramAlteracoes();
+  }
+
+  private dadosFornecedoresSofreramAlteracoes(): boolean {
+    return this.formularioFornecedor.nomeEmpresa !== this.fornecedorSelecionado.nomeEmpresa
+      || this.formularioFornecedor.cnpj !== this.fornecedorSelecionado.cnpj
+      || this.formularioFornecedor.telefone !== this.fornecedorSelecionado.telefone
+      || this.formularioFornecedor.telefoneAlternativo !== this.fornecedorSelecionado.telefoneAlternativo;
   }
 
   public cadastrarEditarFornecedor(): void {
@@ -99,10 +111,67 @@ export class FornecedorComponent implements OnInit {
 
   private cadastrarFornecedor(): void {
     this.processandoCadastroEdicaoFornecedor = true;
+
+    this.fornecedorService.cadastrarFornecedor(this.formularioFornecedor)
+      .subscribe(() => {
+        this.processandoCadastroEdicaoFornecedor = false;
+        this.toastrService.success('Fornecedor cadastrado com sucesso!');
+        this.fecharDialogCadastroEdicaoFornecedor();
+        this.listarFornecedores();
+      },
+      (error:HttpErrorResponse) => {
+        this.processandoCadastroEdicaoFornecedor = false;
+
+        if (error.status === 422) {
+          this.toastrService.error('Existe(m) campo(s) inválido(s)!');
+        }
+        else {
+          this.toastrService.error('Erro ao cadastrar fornecedor!');
+        }
+      });
   }
 
   private alterarDadosFornecedor(): void {
     this.processandoCadastroEdicaoFornecedor = true;
+
+    this.fornecedorService.alterarDadosFornecedor(this.fornecedorSelecionado.id, this.formularioFornecedor)
+      .subscribe(() => {
+        this.processandoCadastroEdicaoFornecedor = false;
+        this.toastrService.success('Dados do fornecedor alterado com sucesso!');
+        this.fecharDialogCadastroEdicaoFornecedor();
+        this.listarFornecedores();
+      },
+      (error:HttpErrorResponse) => {
+        this.processandoCadastroEdicaoFornecedor = false;
+
+        if (error.status === 422) {
+          this.toastrService.error('Existe(m) campo(s) inválido(s)!');
+        }
+        else {
+          this.toastrService.error('Erro ao alterar os dados do fornecedor!');
+        }
+      });
+  }
+
+  public fecharDialogExclusao(): void {
+    this.abrirDialogExclusaoFornecedor = false;
+    this.fornecedorSelecionado = new Fornecedor();
+  }
+
+  public excluirFornecedor(): void {
+    this.processandoExclusaoFornecedor = true;
+
+    this.fornecedorService.excluirFornecedor(this.fornecedorSelecionado.id)
+      .subscribe(() => {
+        this.processandoExclusaoFornecedor = false;
+        this.toastrService.success('Fornecedor excluído com sucesso!');
+        this.fecharDialogExclusao();
+        this.listarFornecedores();
+      },
+      () => {
+        this.processandoExclusaoFornecedor = false;
+        this.toastrService.error('Erro ao excluir fornecedor!');
+      });
   }
 
   public armazenarFornecedorParaVisualizarInformacoes(fornecedor: Fornecedor): void {

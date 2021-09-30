@@ -11,6 +11,8 @@ import { IConfig, NgxMaskModule } from 'ngx-mask';
 
 import { ClienteModule } from './cliente/cliente.module';
 import { FornecedorModule } from './fornecedor/fornecedor.module';
+import { RelatorioModule } from './relatorio/relatorio.module';
+import { LancheModule } from './lanche/lanche.module';
 
 
 const maskConfig: Partial<IConfig> = { validation: false }
@@ -18,7 +20,6 @@ const maskConfig: Partial<IConfig> = { validation: false }
 @NgModule({
   declarations: [
     AppComponent
-    
   ],
   imports: [
     BrowserModule,
@@ -27,6 +28,8 @@ const maskConfig: Partial<IConfig> = { validation: false }
     AppRoutingModule,
     ClienteModule,
     FornecedorModule,
+    LancheModule,
+    RelatorioModule,
     ToastrModule.forRoot({
       timeOut: 4000,
       positionClass: 'toast-bottom-right',

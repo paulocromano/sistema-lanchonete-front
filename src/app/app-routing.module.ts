@@ -3,10 +3,14 @@ import { Routes, RouterModule } from '@angular/router';
 
 import { ClienteComponent } from './cliente/cliente.component';
 import { FornecedorComponent } from './fornecedor/fornecedor.component';
+import { LancheComponent } from './lanche/lanche.component';
+import { RelatorioComponent } from './relatorio/relatorio.component';
 
 const routes: Routes = [
-  //{ path: '', component: ClienteComponent },
-  { path: '', component: FornecedorComponent }
+  { path: 'clientes', component: ClienteComponent },
+  { path: 'fornecedores', component: FornecedorComponent },
+  { path: '', component: LancheComponent },
+  { path: 'relatorios', component: RelatorioComponent }
 ];
 
 @NgModule({

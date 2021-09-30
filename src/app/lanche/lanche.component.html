@@ -1,8 +1,8 @@
 <div class="container-fluid mt-5">
-    <h2 class="text-center">Fornecedores</h2>
+    <h2 class="text-center">Lanches</h2>
 
     <div class="borda-table mt-3">
-        <p-table #dataView [value]="fornecedores" [columns]="colunasTabela" [responsive]="true" 
+        <p-table #dataView [value]="lanches" [columns]="colunasTabela" [responsive]="true" 
             [rows]="8" [paginator]="true" class="text-center">
 
             <ng-template pTemplate="caption">
@@ -16,7 +16,7 @@
                     <div class="col-12 col-sm-6 col-md-6 col-lg-8 text-right">
                         <button class="btn btn-success px-5" (click)="exibirDialogCadastro()">
                             <i class="fas fa-plus"></i>
-                            Cadastrar Fornecedor
+                            Cadastrar Lanche
                         </button>
                     </div>
                 </div>
@@ -26,7 +26,7 @@
                 <tr>
                     <th *ngFor="let coluna of colunas" [pSortableColumn]="coluna.field" [ngClass]="coluna.style" class="text-center">
                         {{ coluna.header }}
-                        <p-sortIcon *ngIf="coluna.header === 'Data do Cadastro' || coluna.header === 'Empresa'" [field]="coluna.field" 
+                        <p-sortIcon *ngIf="coluna.header === 'Nome' || coluna.header === 'Preço R$'" [field]="coluna.field" 
                             ariaLabel="active to sort"
                             ariaLabelDesc="Activate to sort in descending order"
                             ariaLabelAsc="Activate to sort in ascending order">
@@ -35,27 +35,26 @@
                 </tr>
             </ng-template>
 
-            <ng-template pTemplate="body" let-fornecedor>
+            <ng-template pTemplate="body" let-lanche>
                 <tr>
                     <td *ngFor="let coluna of colunasTabela" class="text-center">
                         <span class="ui-column-title text-left">
-                            {{ coluna.field === 'dataCadastro' ? formatarDataCadastroFornecedor(fornecedor[coluna.field]) 
-                                : fornecedor[coluna.field] }}
+                            {{ lanche[coluna.field] }}
                         </span>
                         
                         <span *ngIf="coluna.header === 'Ações'">
                             <button class="btn btn-info mr-2 px-3" pTooltip="Informações" tooltipPosition="bottom"
-                                (click)="armazenarFornecedorParaVisualizarInformacoes(fornecedor)">
+                                (click)="armazenarLancheParaVisualizarInformacoes(lanche)">
                                 <i class="fas fa-info text-light"></i>
                             </button>
 
                             <button class="btn btn-warning" pTooltip="Editar" tooltipPosition="bottom"
-                                (click)="armazenarFornecedorParaEdicao(fornecedor)">
+                                (click)="armazenarLancheParaEdicao(lanche)">
                                 <i class="fas fa-pen text-light"></i>
                             </button>
 
                             <button class="btn btn-danger ml-2" pTooltip="Excluir" tooltipPosition="bottom"
-                                (click)="armazenarFornecedorParaExclusao(fornecedor)">
+                                (click)="armazenarLancheParaExclusao(lanche)">
                                 <i class="fas fa-trash-alt"></i>
                             </button>
                         </span>
@@ -63,11 +62,11 @@
                 </tr>
             </ng-template>
 
-            <ng-template pTemplate="emptymessage" class="text-center" let-fornecedores>
+            <ng-template pTemplate="emptymessage" class="text-center" let-lanches>
                 <tr>
-                    <td [attr.colspan]="fornecedores.length" class="text-center">
+                    <td [attr.colspan]="lanches.length" class="text-center">
                         <span *ngIf="!processandoOperacaoListagem">
-                            {{ inputPesquisa ? 'Nenhum fornecedor corresponde à pesquisa!' : 'Nenhum fornecedor encontrado!' }}
+                            {{ inputPesquisa ? 'Nenhum lanche corresponde à pesquisa!' : 'Nenhum lanche encontrado!' }}
                         </span>
 
                         <span *ngIf="processandoOperacaoListagem && !inputPesquisa">
@@ -78,31 +77,32 @@
             </ng-template>
 
             <ng-template pTemplate="summary">
-                Fornecedores Encontrados: {{ fornecedores ? fornecedores.length : 0 }}
+                Lanches Encontrados: {{ lanches ? lanches.length : 0 }}
             </ng-template>
         </p-table>
     </div>
 </div>
 
-<!-- Dialog cadastro de Fornecedor -->
-<p-dialog [visible]="abrirDialogCadastro || abrirDialogEdicaoFornecedor" [modal]="true" [blockScroll]="true" 
+<!-- Dialog cadastro de Lanche -->
+<p-dialog [visible]="abrirDialogCadastro || abrirDialogEdicaoLanche" [modal]="true" [blockScroll]="true" 
     [draggable]="false" [closable]="false" [style]="{width: '70vw'}">
 
-    <p-header>{{ abrirDialogCadastro ? 'Cadastro de Fornecedor' : 'Alteração dos Dados do(a) Fornecedor(a)' }}</p-header>
+    <p-header>{{ abrirDialogCadastro ? 'Cadastro de Lanche' : 'Alteração dos Dados do Lanche' }}</p-header>
 
     <div class="container-fluid">
         <div class="row">
             <div class="col-12 col-md-6 mt-4">
                 <span class="p-float-label">
-                    <input type="text" style="width: 100%;" maxlength="100" [(ngModel)]="formularioFornecedor.nomeEmpresa" pInputText> 
-                    <label for="inputtext">Nome da Empresa</label>
+                    <input type="text" style="width: 100%" maxlength="60" [(ngModel)]="formularioLanche.nome" pInputText> 
+                    <label for="inputtext">Nome</label>
                 </span>
             </div>
             <div class="col-12 col-md-6 mt-4">
                 <span class="p-float-label">
-                    <input type="text" style="width: 180px;" [(ngModel)]="formularioFornecedor.cnpj"
-                        [dropSpecialCharacters]="false" mask="00.000.000/0000-00" pInputText> 
-                    <label for="inputtext">CNPJ</label>
+                    <textarea [rows]="2" [style]="{ width: '100%' }" [(ngModel)]="formularioLanche.ingredientes" 
+                        pInputTextarea>
+                    </textarea>
+                    <label for="inputtext">Ingredientes</label>
                 </span>
             </div>
         </div>
@@ -110,51 +110,31 @@
         <div class="row">
             <div class="col-12 col-md-6 mt-4">
                 <span class="p-float-label">
-                    <input type="text" style="width: 160px;" [(ngModel)]="formularioFornecedor.telefone"
-                        [dropSpecialCharacters]="false" mask="(00) 0000-0000||(00) 00000-0000" pInputText> 
-                    <label for="inputtext">Telefone</label>
+                    <p-inputNumber [(ngModel)]="formularioLanche.preco" [min]="1" mode="currency" 
+                        currency="BRL" locale="pt-BR">
+                    </p-inputNumber>
+                    <label for="inputtext">Preço</label>
                 </span>
             </div>
             <div class="col-12 col-md-6 mt-4">
-                <span class="p-float-label">
-                    <input type="text" style="width: 160px;" [(ngModel)]="formularioFornecedor.telefoneAlternativo" 
-                        [dropSpecialCharacters]="false" mask="(00) 0000-0000||(00) 00000-0000" pInputText> 
-                    <label for="inputtext">Telefone Alternativo</label>
-                </span>
+                <div class="btn btn-info" style="max-height: 40px;">
+                    <i class="fas fa-upload mr-1"></i>
+                    <input type="file" id="file" (change)="eventoImagemSelecionadaParaEnvio($event)" accept=".png, .jpg">
+                    <label for="file">Upload da Imagem</label>
+                </div>
             </div>
         </div>
     </div>
 
     <p-footer>
-        <button class="btn btn-danger" (click)="fecharDialogCadastroEdicaoFornecedor()">
+        <button class="btn btn-danger" (click)="fecharDialogCadastroEdicaoLanche()">
             <i class="fas fa-arrow-circle-left"></i>
             Voltar
         </button>
 
-        <button class="btn btn-success" [disabled]="desabilitarBotaoCadastroEdicaoFornecedor()" 
-            (click)="cadastrarEditarFornecedor()">
-            <i class="fas " [ngClass]="processandoCadastroEdicaoFornecedor ? 'fa-spin fa-circle-notch' : 'fa-check-circle'"></i>
-            Confirmar
-        </button>
-    </p-footer>
-</p-dialog>
-
-<!-- Dialog exclusão sobre o Fornecedor -->
-<p-dialog [visible]="abrirDialogExclusaoFornecedor" [modal]="true" [blockScroll]="true" 
-    [draggable]="false" [closable]="false" [style]="{width: '30vw'}">
-
-    <p-header>Excluir Fornecedor</p-header>
-
-    <div>Deseja excluir o(a) Fornecedor(a) <b>{{ fornecedorSelecionado.nomeEmpresa }}</b>?</div>
-
-    <p-footer>
-        <button class="btn btn-danger" (click)="fecharDialogExclusao()">
-            <i class="fas fa-arrow-circle-left"></i>
-            Voltar
-        </button>
-        <button class="btn btn-success" [disabled]="processandoExclusaoFornecedor" 
-            (click)="excluirFornecedor()">
-            <i class="fas " [ngClass]="processandoExclusaoFornecedor ? 'fa-spin fa-circle-notch' : 'fa-check-circle'"></i>
+        <button class="btn btn-success" [disabled]="desabilitarBotaoCadastroEdicaoLanche()" 
+            (click)="cadastrarEditarLanche()">
+            <i class="fas " [ngClass]="processandoCadastroEdicaoLanche ? 'fa-spin fa-circle-notch' : 'fa-check-circle'"></i>
             Confirmar
         </button>
     </p-footer>

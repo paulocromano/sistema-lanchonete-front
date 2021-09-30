@@ -78,7 +78,7 @@
             </ng-template>
 
             <ng-template pTemplate="summary">
-                Clientes encontrados: {{ clientes ? clientes.length : 0 }}
+                Clientes Encontrados: {{ clientes ? clientes.length : 0 }}
             </ng-template>
         </p-table>
     </div>
@@ -227,7 +227,7 @@
     </p-footer>
 </p-dialog>
 
-<!-- Dialog informações sobre o Cliente -->
+<!-- Dialog exclusão sobre o Cliente -->
 <p-dialog [visible]="abrirDialogExclusaoCliente" [modal]="true" [blockScroll]="true" 
     [draggable]="false" [closable]="false" [style]="{width: '30vw'}">
 
