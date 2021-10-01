@@ -38,7 +38,9 @@
             <ng-template pTemplate="body" let-lanche>
                 <tr>
                     <td *ngFor="let coluna of colunasTabela" class="text-center">
-                        <span class="ui-column-title text-left">
+                        <img *ngIf="coluna.field === 'imagemBase64'" [src]="lanche[coluna.field]" alt="Imagem do lanche"
+                            class="imagem-lanche">
+                        <span *ngIf="coluna.field !== 'imagemBase64'" class="ui-column-title text-left">
                             {{ lanche[coluna.field] }}
                         </span>
                         
@@ -117,11 +119,16 @@
                 </span>
             </div>
             <div class="col-12 col-md-6 mt-4">
-                <div class="btn btn-info" style="max-height: 40px;">
+                <button class="btn btn-info" style="max-height: 40px;" [disabled]="processandoUploadImagemLanche">
                     <i class="fas fa-upload mr-1"></i>
-                    <input type="file" id="file" (change)="eventoImagemSelecionadaParaEnvio($event)" accept=".png, .jpg">
+                    <input type="file" id="file"
+                        (change)="eventoImagemSelecionadaParaEnvio($event)" accept=".png, .jpg">
                     <label for="file">Upload da Imagem</label>
-                </div>
+                </button>
+
+                <span class="ml-2" [ngClass]="{ 'fas fa-spin fa-circle-notch' : processandoUploadImagemLanche }"></span>
+                <div *ngIf="nomeImagemUpload"><b>Arquivo Selecionado: </b>{{ nomeImagemUpload }}</div>
+                <div *ngIf="!nomeImagemUpload">Nenhum arquivo selecionado!</div>
             </div>
         </div>
     </div>
@@ -135,6 +142,30 @@
         <button class="btn btn-success" [disabled]="desabilitarBotaoCadastroEdicaoLanche()" 
             (click)="cadastrarEditarLanche()">
             <i class="fas " [ngClass]="processandoCadastroEdicaoLanche ? 'fa-spin fa-circle-notch' : 'fa-check-circle'"></i>
+            Confirmar
+        </button>
+    </p-footer>
+</p-dialog>
+
+<!-- Dialog exclusão sobre o Fornecedor -->
+<p-dialog [visible]="abrirDialogExclusaoLanche" [modal]="true" [blockScroll]="true" 
+    [draggable]="false" [closable]="false" [style]="{width: '30vw'}">
+
+    <p-header>Excluir Lanche</p-header>
+
+    <div>Deseja excluir o lanche <b>{{ lancheSelecionado.nome }}</b>?</div>
+    <div class="text-center mt-2">
+        <img class="imagem-lanche-exclusao" [src]="lancheSelecionado.imagemBase64" alt="Imagem do lanche">
+    </div>
+
+    <p-footer>
+        <button class="btn btn-danger" (click)="fecharDialogExclusaoLanche()">
+            <i class="fas fa-arrow-circle-left"></i>
+            Voltar
+        </button>
+        <button class="btn btn-success" [disabled]="processandoExclusaoLanche" 
+            (click)="excluirLanche()">
+            <i class="fas " [ngClass]="processandoExclusaoLanche ? 'fa-spin fa-circle-notch' : 'fa-check-circle'"></i>
             Confirmar
         </button>
     </p-footer>

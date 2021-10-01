@@ -5,6 +5,8 @@ import { ToastrService } from 'ngx-toastr';
 import { Lanche } from './shared/model/lanche.model';
 import { LancheFORM } from './shared/model/lanche.form';
 import { LancheService } from './shared/service/lanche.service';
+import { ImagemLancheBase64 } from './shared/model/imagem-lanche-base-64.model';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-lanche',
@@ -16,6 +18,7 @@ export class LancheComponent implements OnInit {
   public lanches: Lanche[] = [];
   public lancheSelecionado: Lanche = new Lanche();
   public formularioLanche: LancheFORM = new LancheFORM();
+  public nomeImagemUpload: string;
 
   public colunasTabela: any;
   public inputPesquisa: string;
@@ -27,6 +30,7 @@ export class LancheComponent implements OnInit {
 
   public processandoOperacaoListagem: boolean = false;
   public processandoCadastroEdicaoLanche: boolean = false;
+  public processandoUploadImagemLanche: boolean = false;
   public processandoExclusaoLanche: boolean = false;
 
   constructor(
@@ -72,10 +76,14 @@ export class LancheComponent implements OnInit {
     this.abrirDialogEdicaoLanche = false;
     this.lancheSelecionado = new Lanche();
     this.formularioLanche = new LancheFORM();
+    this.nomeImagemUpload = null;
   }
 
   public desabilitarBotaoCadastroEdicaoLanche(): boolean {
-    return;
+    return this.processandoCadastroEdicaoLanche || this.processandoUploadImagemLanche
+      || !(this.formularioLanche && this.formularioLanche.nome
+        && this.formularioLanche.ingredientes && this.formularioLanche.preco
+        && this.formularioLanche.imagemBase64);
   }
 
   public cadastrarEditarLanche(): void {
@@ -88,22 +96,68 @@ export class LancheComponent implements OnInit {
   }
 
   public eventoImagemSelecionadaParaEnvio(eventoUpload: any): void {
-    const imagens: FileList = eventoUpload.srcElement.files
-    console.log(imagens)
+    this.processandoUploadImagemLanche = true;
+    const imagem: File = eventoUpload.srcElement.files[0];
+    this.nomeImagemUpload = imagem.name;
 
-    this.lancheService.encodeImagemLancheParaBase64(imagens[0])
-      .subscribe((base64: any) => {
-        console.log(base64)
+    this.lancheService.encodeImagemLancheParaBase64(imagem)
+      .subscribe((imagem: ImagemLancheBase64) => {
+        this.formularioLanche.imagemBase64 = imagem.imagemBase64;
+        this.processandoUploadImagemLanche = false;
       },
-      (error) => console.log(error))
+      () => {
+        this.processandoUploadImagemLanche = false;
+        this.nomeImagemUpload = null;
+        this.formularioLanche.imagemBase64 = null;
+        this.toastrService.error('Erro ao fazer upload da imagem!');
+      })
   }
 
   private cadastrarLanche(): void {
     this.processandoCadastroEdicaoLanche = true;
+
+    this.lancheService.cadastrarLanche(this.formularioLanche)
+      .subscribe(() => {
+        this.processandoCadastroEdicaoLanche = false;
+        this.toastrService.success('Lanche cadastrado com sucesso!');
+        this.fecharDialogCadastroEdicaoLanche();
+        this.listarLanches();
+      },
+      (error: HttpErrorResponse) => {
+        this.processandoCadastroEdicaoLanche = false;
+
+        if (error.status === 422) {
+          this.toastrService.error('Erro de validação de campos!');
+        }
+        else {
+          this.toastrService.error('Erro ao cadastrar lanche!');
+        }
+      });
   }
 
   private alterarDadosLanche(): void {
     this.processandoCadastroEdicaoLanche = true;
+  }
+
+  public fecharDialogExclusaoLanche(): void {
+    this.abrirDialogExclusaoLanche = false;
+    this.lancheSelecionado = new Lanche();
+  }
+
+  public excluirLanche(): void {
+    this.processandoExclusaoLanche = true;
+
+    this.lancheService.excluirLanche(this.lancheSelecionado.id)
+      .subscribe(() => {
+        this.processandoExclusaoLanche = false;
+        this.toastrService.success('Lanche excluído com sucesso!');
+        this.fecharDialogExclusaoLanche();
+        this.listarLanches();
+      },
+      () => {
+        this.processandoExclusaoLanche = false;
+        this.toastrService.error('Erro ao excluir lanche!');
+      });
   }
 
   public armazenarLancheParaVisualizarInformacoes(lanche: Lanche): void {
