@@ -174,6 +174,11 @@ export class FornecedorComponent implements OnInit {
       });
   }
 
+  public fecharDialogInformacoes(): void {
+    this.fornecedorSelecionado = new Fornecedor();
+    this.abrirDialogInformacoesFornecedor = false;
+  }
+
   public armazenarFornecedorParaVisualizarInformacoes(fornecedor: Fornecedor): void {
     this.fornecedorSelecionado = fornecedor;
     this.abrirDialogInformacoesFornecedor = true;
@@ -188,5 +193,13 @@ export class FornecedorComponent implements OnInit {
   public armazenarFornecedorParaExclusao(fornecedor: Fornecedor): void {
     this.fornecedorSelecionado = fornecedor;
     this.abrirDialogExclusaoFornecedor = true;
+  }
+
+  public formatarDataCadastroCliente(dataCadastro: Date): string {
+    if (dataCadastro)  {
+      const data: string[] = dataCadastro.toString().split('-');
+      return `${data[2]}/${data[1]}/${data[0]}`;
+    }
+    return '';
   }
 }

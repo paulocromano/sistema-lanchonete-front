@@ -21,5 +21,11 @@ input[type="file"] {
 .imagem-lanche-exclusao {
     width: 160px; 
     height: 160px;
-    border-radius: 30%;
+    border-radius: 10%;
+}
+
+.imagem-lanche-informacoes {
+    width: 200px; 
+    height: 200px;
+    border-radius: 10%;
 }

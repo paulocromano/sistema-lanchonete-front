@@ -38,9 +38,12 @@
             <ng-template pTemplate="body" let-fornecedor>
                 <tr>
                     <td *ngFor="let coluna of colunasTabela" class="text-center">
-                        <span class="ui-column-title text-left">
+                        <span *ngIf="coluna.field !== 'telefoneAlternativo'" class="ui-column-title text-left">
                             {{ coluna.field === 'dataCadastro' ? formatarDataCadastroFornecedor(fornecedor[coluna.field]) 
                                 : fornecedor[coluna.field] }}
+                        </span>
+                        <span *ngIf="coluna.field === 'telefoneAlternativo'" class="ui-column-title text-left">
+                            {{ fornecedor[coluna.field] ? fornecedor[coluna.field] : '---' }}
                         </span>
                         
                         <span *ngIf="coluna.header === 'Ações'">
@@ -156,6 +159,30 @@
             (click)="excluirFornecedor()">
             <i class="fas " [ngClass]="processandoExclusaoFornecedor ? 'fa-spin fa-circle-notch' : 'fa-check-circle'"></i>
             Confirmar
+        </button>
+    </p-footer>
+</p-dialog>
+
+<!-- Dialog informações sobre o Fornecedor -->
+<p-dialog [visible]="abrirDialogInformacoesFornecedor" [modal]="true" [blockScroll]="true" 
+    [draggable]="false" [closable]="false" [style]="{width: '40vw'}">
+
+    <p-header>Informções sobre o Fornecedor</p-header>
+
+    <div class="container-fluid mt-4">
+        <div><b>Nome da Empresa: </b>{{ fornecedorSelecionado.nomeEmpresa }}</div>
+        <div><b>CNPJ: </b>{{ fornecedorSelecionado.cnpj }}</div>
+        <div><b>Telefone: </b>{{ fornecedorSelecionado.telefone }}</div>
+        <div><b>Telefone Alternativo: </b>
+            {{ fornecedorSelecionado.telefoneAlternativo ? fornecedorSelecionado.telefoneAlternativo : '---' }}
+        </div>
+        <div><b>Data do Cadastro: </b>{{ formatarDataCadastroCliente(fornecedorSelecionado.dataCadastro) }}</div>
+    </div>
+
+    <p-footer>
+        <button class="btn btn-danger" (click)="fecharDialogInformacoes()">
+            <i class="fas fa-arrow-circle-left"></i>
+            Voltar
         </button>
     </p-footer>
 </p-dialog>

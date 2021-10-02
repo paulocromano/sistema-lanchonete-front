@@ -112,9 +112,10 @@
         <div class="row">
             <div class="col-12 col-md-6 mt-4">
                 <span class="p-float-label">
-                    <p-inputNumber [(ngModel)]="formularioLanche.preco" [min]="1" mode="currency" 
-                        currency="BRL" locale="pt-BR">
-                    </p-inputNumber>
+                    <input type="text" pInputText style="width: 130px;"
+                        [dropSpecialCharacters]="false" mask="0*,00"
+                        [(ngModel)]="formularioLanche.preco"
+                        (blur)="eventoPerdaFocoBolsaMensal()"/>
                     <label for="inputtext">Preço</label>
                 </span>
             </div>
@@ -127,9 +128,13 @@
                 </button>
 
                 <span class="ml-2" [ngClass]="{ 'fas fa-spin fa-circle-notch' : processandoUploadImagemLanche }"></span>
-                <div *ngIf="nomeImagemUpload"><b>Arquivo Selecionado: </b>{{ nomeImagemUpload }}</div>
-                <div *ngIf="!nomeImagemUpload">Nenhum arquivo selecionado!</div>
+                <div *ngIf="!formularioLanche.imagemBase64">Nenhum arquivo selecionado!</div>
             </div>
+        </div>
+
+        <div class="text-center mt-5">
+            <img *ngIf="formularioLanche.imagemBase64" [src]="formularioLanche.imagemBase64" alt="Imagem do lanche"
+            class="imagem-lanche">
         </div>
     </div>
 
@@ -167,6 +172,31 @@
             (click)="excluirLanche()">
             <i class="fas " [ngClass]="processandoExclusaoLanche ? 'fa-spin fa-circle-notch' : 'fa-check-circle'"></i>
             Confirmar
+        </button>
+    </p-footer>
+</p-dialog>
+
+<!-- Dialog informações sobre o Lanche -->
+<p-dialog [visible]="abrirDialogInformacoesLanche" [modal]="true" [blockScroll]="true" 
+    [draggable]="false" [closable]="false" [style]="{width: '40vw'}">
+
+    <p-header>Informações sobre o Lanche</p-header>
+
+    <div class="container-fluid mt-4">
+        <div><b>Nome: </b>{{ lancheSelecionado.nome }}</div>
+        <div><b>Ingredientes: </b>{{ lancheSelecionado.ingredientes }}</div>
+        <div><b>Preço R$: </b>{{ lancheSelecionado.preco }}</div>
+        <div><b>Data do Cadastro: </b>{{ formatarDataCadastroCliente(lancheSelecionado.dataCadastro) }}</div>
+
+        <div class="mt-4 text-center">
+            <img class="imagem-lanche-informacoes" [src]="lancheSelecionado.imagemBase64" alt="Imagem do lanche">
+        </div>
+    </div>
+
+    <p-footer>
+        <button class="btn btn-danger" (click)="fecharDialogInformacoes()">
+            <i class="fas fa-arrow-circle-left"></i>
+            Voltar
         </button>
     </p-footer>
 </p-dialog>
