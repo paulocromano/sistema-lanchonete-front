@@ -1,0 +1,86 @@
+<div class="container-fluid mt-5">
+    <h2 class="text-center">Despesas</h2>
+
+    <div class="borda-table mt-3">
+        <p-table #dataView [value]="despesas" [columns]="colunasTabela" [responsive]="true" [rows]="8" 
+            [paginator]="true" class="text-center">
+
+            <ng-template pTemplate="caption">
+                <div class="row">
+                    <div class="col-12 col-sm-6 col-md-6 col-lg-4">
+                        <input type="text" pInputText placeholder="Pesquisa" class="pesquisa" [(ngModel)]="inputPesquisa"
+                            (input)="dataView.filterGlobal($event.target.value, 'contains')">
+                        <i class="fas fa-search" style="font-size: 1.18em;"></i>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-md-6 col-lg-8 text-right">
+                        <button class="btn btn-success px-5" (click)="exibirDialogCadastro()">
+                            <i class="fas fa-plus"></i>
+                            Cadastrar Despesa
+                        </button>
+                    </div>
+                </div>
+            </ng-template>
+
+            <ng-template pTemplate="header" let-colunas>
+                <tr>
+                    <th *ngFor="let coluna of colunas" [pSortableColumn]="coluna.field" [ngClass]="coluna.style" class="text-center">
+                        {{ coluna.header }}
+                        <p-sortIcon *ngIf="coluna.header === 'Data do Cadastro' || coluna.header === 'Nome'" [field]="coluna.field" 
+                            ariaLabel="active to sort"
+                            ariaLabelDesc="Activate to sort in descending order"
+                            ariaLabelAsc="Activate to sort in ascending order">
+                        </p-sortIcon>
+                    </th>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-despesa>
+                <tr>
+                    <td class="col-dataVencimento">
+                        <span class="ui-column-title text-left">Data do Vencimento</span>
+                        {{ despesa.dataVencimento }}
+                    </td>
+                    <td>
+                        <span class="ui-column-title text-left">Descrição</span>
+                        {{ despesa.desricao }}
+                    </td>
+                    <td>
+                        <span class="ui-column-title text-left">Valor R$</span>
+                        {{ despesa.valor }}
+                    </td>
+                    <td>
+                        <span class="ui-column-title text-left">Situação</span>
+                        {{ despesa.situacao }}
+                    </td>
+                    <td>
+                        <span class="ui-column-title text-left">Tipo</span>
+                        {{ despesa.tipoDespesa }}
+                    </td>
+                    <td>
+                        <span class="ui-column-title text-left">Ações</span>
+                        
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage" class="text-center" let-despesas>
+                <tr>
+                    <td [attr.colspan]="despesas.length" class="text-center">
+                        <span *ngIf="!processandoOperacaoListagem">
+                            {{ inputPesquisa ? 'Nenhuma Despesa corresponde à pesquisa!' : 'Nenhuma Despesa encontrada!' }}
+                        </span>
+
+                        <span *ngIf="processandoOperacaoListagem && !inputPesquisa">
+                            <p-progressSpinner strokeWidth="3"></p-progressSpinner>
+                        </span>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="summary">
+                Despesas Encontradas: {{ clientes ? despesas.length : 0 }}
+            </ng-template>
+        </p-table>
+    </div>
+</div>
