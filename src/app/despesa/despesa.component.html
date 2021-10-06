@@ -26,7 +26,7 @@
                 <tr>
                     <th *ngFor="let coluna of colunas" [pSortableColumn]="coluna.field" [ngClass]="coluna.style" class="text-center">
                         {{ coluna.header }}
-                        <p-sortIcon *ngIf="coluna.header === 'Data do Cadastro' || coluna.header === 'Nome'" [field]="coluna.field" 
+                        <p-sortIcon *ngIf="coluna.header !== 'Ações'" [field]="coluna.field" 
                             ariaLabel="active to sort"
                             ariaLabelDesc="Activate to sort in descending order"
                             ariaLabelAsc="Activate to sort in ascending order">
@@ -37,29 +37,29 @@
 
             <ng-template pTemplate="body" let-despesa>
                 <tr>
-                    <td class="col-dataVencimento">
-                        <span class="ui-column-title text-left">Data do Vencimento</span>
-                        {{ despesa.dataVencimento }}
-                    </td>
-                    <td>
-                        <span class="ui-column-title text-left">Descrição</span>
-                        {{ despesa.desricao }}
-                    </td>
-                    <td>
-                        <span class="ui-column-title text-left">Valor R$</span>
-                        {{ despesa.valor }}
-                    </td>
-                    <td>
-                        <span class="ui-column-title text-left">Situação</span>
-                        {{ despesa.situacao }}
-                    </td>
-                    <td>
-                        <span class="ui-column-title text-left">Tipo</span>
-                        {{ despesa.tipoDespesa }}
-                    </td>
-                    <td>
-                        <span class="ui-column-title text-left">Ações</span>
-                        
+                    <td class="text-center">{{ formatarData(despesa.dataVencimento) }}</td>
+                    <td class="text-center">{{ despesa.descricao }}</td>
+                    <td class="text-center">{{ despesa.valor }}</td>
+                    <td class="text-center">{{ despesa.situacao }}</td>
+                    <td class="text-center">{{ despesa.tipoDespesa }}</td>
+                    <td class="text-center">
+                        <button class="btn btn-info mr-2" pTooltip="Informações" tooltipPosition="bottom"
+                            (click)="exibirDialogInformacoes(despesa)">
+                            <i class="fas fa-info text-light px-1"></i>
+                        </button>
+                        <button class="btn btn-warning mr-2" pTooltip="Editar" tooltipPosition="bottom"
+                            (click)="exibirDialogAlteracaoDespesa(despesa)">
+                            <i class="fas fa-pen text-light"></i>
+                        </button>
+                        <button *ngIf="despesa.situacao !== 'Paga'" class="btn btn-success mr-2"
+                            pTooltip="Pagar Conta" tooltipPosition="bottom"
+                            (click)="exibirDialogpagarDespesa(despesa)">
+                            <i class="fas fa-dollar-sign"></i>
+                        </button>
+                        <button class="btn btn-danger" pTooltip="Excluir" tooltipPosition="bottom"
+                            (click)="exibirDialogExcluirDespesa(despesa)">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
                     </td>
                 </tr>
             </ng-template>
@@ -79,8 +79,140 @@
             </ng-template>
 
             <ng-template pTemplate="summary">
-                Despesas Encontradas: {{ clientes ? despesas.length : 0 }}
+                Despesas Encontradas: {{ despesas ? despesas.length : 0 }}
             </ng-template>
         </p-table>
     </div>
 </div>
+
+<!-- Dialog cadastro de Despesa -->
+<p-dialog [visible]="abrirDialogCadastro" [modal]="true" [blockScroll]="true" 
+    [draggable]="false" [closable]="false" [style]="{width: '60vw'}">
+
+    <p-header>Cadastrar Despesa</p-header>
+
+    <div class="container-fluid">
+
+    </div>
+
+    <p-footer>
+        <button class="btn btn-danger" (click)="fecharDialogCadastro()">
+            <i class="fas fa-arrow-circle-left"></i>
+            Voltar
+        </button>
+        <button class="btn btn-success" [disabled]="desabilitarBotaoConfirmarCadastroDespesa()" 
+            (click)="alterarDespesa()">
+            <i class="fas " [ngClass]="processandoCadastroDespesa ? 'fa-spin fa-circle-notch' : 'fa-check-circle'"></i>
+            Confirmar
+         </button>
+    </p-footer>
+</p-dialog>
+
+<!-- Dialog informações sobre a Despesa -->
+<p-dialog [visible]="abrirDialogInformacoesDespesa" [modal]="true" [blockScroll]="true" 
+    [draggable]="false" [closable]="false" [style]="{width: '40vw'}">
+
+    <p-header>Informações da Despesa</p-header>
+
+    <div class="container-fluid">
+        <div><b>Descrição: </b>{{ despesaSelecionada.descricao }}</div>
+        <div><b>Tipo de Despesa: </b>{{ despesaSelecionada.tipoDespesa }}</div>
+        <div><b>Valor R$: </b>{{ despesaSelecionada.valor }}</div>
+        <div><b>Situação: </b>{{ despesaSelecionada.situacao }}</div>
+        <div><b>Data do Cadastro: </b>{{ formatarData(despesaSelecionada.dataCadastro) }}</div>
+        <div><b>Data do Pagamento: </b>{{ formatarData(despesaSelecionada.dataPagamento) }}</div>
+        <div><b>Data do Vencimento: </b>{{formatarData(despesaSelecionada.dataVencimento) }}</div>
+    </div>
+
+    <p-footer>
+        <button class="btn btn-danger" (click)="fecharDialogInformacoes()">
+            <i class="fas fa-arrow-circle-left"></i>
+            Voltar
+        </button>
+    </p-footer>
+</p-dialog>
+
+<!-- Dialog alteração da Despesa -->
+<p-dialog [visible]="abrirDialogEdicaoDespesa" [modal]="true" [blockScroll]="true" 
+    [draggable]="false" [closable]="false" [style]="{width: '40vw'}">
+
+    <p-header>Alterar Dados da Despesa</p-header>
+
+    <div class="container-fluid">
+        <div class="mt-4">
+            <span class="p-float-label">
+                <input type="text" style="width: 100%;" [(ngModel)]="formularioAlteracaoDespesa.descricao" pInputText> 
+                <label for="inputtext">Descrição</label>
+            </span>
+        </div>
+        <div class="mt-4">
+            <span class="p-float-label">
+                <input type="text" pInputText style="width: 130px;"
+                    [dropSpecialCharacters]="false" mask="0*,00"
+                    [(ngModel)]="formularioAlteracaoDespesa.valor"
+                    (blur)="eventoPerdaFocoValorDespesa()"/>
+                <label for="inputtext">Valor R$</label>
+            </span>
+        </div>
+    </div>
+
+    <p-footer>
+        <button class="btn btn-danger" (click)="fecharDialogAlteracaoDespesa()">
+            <i class="fas fa-arrow-circle-left"></i>
+            Voltar
+        </button>
+        <button class="btn btn-success" [disabled]="desabilitarBotaoConfirmarAlteracoesDaDespesa()" 
+            (click)="alterarDespesa()">
+            <i class="fas " [ngClass]="processandoEdicaoDespesa ? 'fa-spin fa-circle-notch' : 'fa-check-circle'"></i>
+            Confirmar
+         </button>
+    </p-footer>
+</p-dialog>
+
+<!-- Dialog alteração da Despesa -->
+<p-dialog [visible]="abrirDialogPagamentoDespesa" [modal]="true" [blockScroll]="true" 
+    [draggable]="false" [closable]="false" [style]="{width: '35vw'}">
+
+    <p-header>Pagar Despesa</p-header>
+
+    <div class="container-fluid mt-4">
+        Deseja pagar o(a) <b>{{ despesaSelecionada.descricao }}</b> no valor de R$ 
+            <b>{{ despesaSelecionada.valor }}</b>?
+    </div>
+
+    <p-footer>
+        <button class="btn btn-danger" (click)="fecharDialogPagamentoDespesa()">
+            <i class="fas fa-arrow-circle-left"></i>
+            Voltar
+        </button>
+        <button class="btn btn-success" [disabled]="processandoPagamentoDespesa" 
+            (click)="confirmarPagamentoDespesa()">
+            <i class="fas " [ngClass]="processandoPagamentoDespesa ? 'fa-spin fa-circle-notch' : 'fa-check-circle'"></i>
+            Confirmar
+         </button>
+    </p-footer>
+</p-dialog>
+
+
+<!-- Dialog exclusão de Despesa -->
+<p-dialog [visible]="abrirDialogExclusaoDespesa" [modal]="true" [blockScroll]="true" 
+    [draggable]="false" [closable]="false" [style]="{width: '40vw'}">
+
+    <p-header>Excluir Despesa</p-header>
+
+    <div class="container-fluid">
+        Deseja excluir a despesa <b>{{ despesaSelecionada.descricao }}</b>?
+    </div>
+
+    <p-footer>
+        <button class="btn btn-danger" (click)="fecharDialogExclusaoDespesa()">
+            <i class="fas fa-arrow-circle-left"></i>
+            Voltar
+        </button>
+        <button class="btn btn-success" [disabled]="processandoExclusaoDespesa" 
+            (click)="excluirDespesa()">
+            <i class="fas " [ngClass]="processandoExclusaoDespesa ? 'fa-spin fa-circle-notch' : 'fa-check-circle'"></i>
+            Confirmar
+         </button>
+    </p-footer>
+</p-dialog>

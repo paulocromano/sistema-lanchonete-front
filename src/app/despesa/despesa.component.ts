@@ -26,11 +26,13 @@ export class DespesaComponent implements OnInit {
   public abrirDialogCadastro: boolean = false; 
   public abrirDialogInformacoesDespesa: boolean = false;
   public abrirDialogEdicaoDespesa: boolean = false;
+  public abrirDialogPagamentoDespesa: boolean = false;
   public abrirDialogExclusaoDespesa: boolean = false;
 
   public processandoOperacaoListagem: boolean = false;
   public processandoCadastroDespesa: boolean = false;
   public processandoEdicaoDespesa: boolean = false;
+  public processandoPagamentoDespesa: boolean = false;
   public processandoExclusaoDespesa: boolean = false;
 
   constructor(
@@ -54,6 +56,14 @@ export class DespesaComponent implements OnInit {
     ];
   }
 
+  public formatarData(dataCadastro: Date): string {
+    if (dataCadastro)  {
+      const data: string[] = dataCadastro.toString().split('-');
+      return `${data[2]}/${data[1]}/${data[0]}`;
+    }
+    return '---';
+  }
+
   private listarDespesas(): void {
     this.processandoOperacaoListagem = true;
 
@@ -72,12 +82,22 @@ export class DespesaComponent implements OnInit {
     this.abrirDialogCadastro = true;
   }
 
+  public fecharDialogCadastro(): void {
+    this.abrirDialogCadastro = false;
+    this.formularioDespesa = new DespesaFORM();
+  }
+
+  public desabilitarBotaoConfirmarCadastroDespesa(): boolean {
+    return;
+  }
+
   public cadastrarDespesa(): void {
     this.processandoCadastroDespesa = true;
 
     this.despesaService.cadastrarDespesa(this.formularioDespesa)
       .subscribe(() => {
         this.processandoCadastroDespesa = false;
+        this.toastrService.success('Despesa cadastrada com sucesso!');
         this.listarDespesas();
       },
       (error: HttpErrorResponse) => {
@@ -94,12 +114,14 @@ export class DespesaComponent implements OnInit {
 
   public alterarDespesa(): void {
     this.processandoEdicaoDespesa = true;
-
+    this.formularioAlteracaoDespesa.valor = this.formularioAlteracaoDespesa.valor.replace(',', '.');
+    
     this.despesaService.alterarDespesa(this.despesaSelecionada.id, this.formularioAlteracaoDespesa)
       .subscribe(() => {
         this.processandoEdicaoDespesa = false;
+        this.toastrService.success('Dados da Despesa alterada com sucesso!');
+        this.fecharDialogAlteracaoDespesa();
         this.listarDespesas();
-
       },
       (error: HttpErrorResponse) => {
         this.processandoEdicaoDespesa = false;
@@ -114,15 +136,17 @@ export class DespesaComponent implements OnInit {
   }
 
   public confirmarPagamentoDespesa(): void {
-    this.processandoEdicaoDespesa = true;
+    this.processandoPagamentoDespesa = true;
 
     this.despesaService.confirmarPagamentoDespesa(this.despesaSelecionada.id)
       .subscribe(() => {
-        this.processandoEdicaoDespesa = false;
+        this.processandoPagamentoDespesa = false;
+        this.toastrService.success('Despesa paga com sucesso!');
+        this.fecharDialogPagamentoDespesa();
         this.listarDespesas();
       },
       () => {
-        this.processandoEdicaoDespesa = false;
+        this.processandoPagamentoDespesa = false;
         this.toastrService.error('Erro ao confirmar o pagamento da Despesa!');
       });
   }
@@ -133,11 +157,81 @@ export class DespesaComponent implements OnInit {
     this.despesaService.excluirDespesa(this.despesaSelecionada.id)
       .subscribe(() => {
         this.processandoExclusaoDespesa = false;
+        this.toastrService.success('Despesa excluída com sucesso!');
+        this.fecharDialogExclusaoDespesa();
         this.listarDespesas();
       },
       () => {
         this.processandoExclusaoDespesa = false;
         this.toastrService.error('Erro ao excluir a Despesa!');
       });
+  }
+
+  public exibirDialogInformacoes(despesa: Despesa): void {
+    this.despesaSelecionada = despesa;
+    this.abrirDialogInformacoesDespesa = true;
+  }
+  
+  public fecharDialogInformacoes(): void {
+    this.abrirDialogInformacoesDespesa = false;
+    this.despesaSelecionada = new Despesa();
+  }
+
+  public exibirDialogAlteracaoDespesa(despesa: Despesa): void {
+    this.formularioAlteracaoDespesa.descricao = despesa.descricao;
+    this.formularioAlteracaoDespesa.valor =  despesa.valor.toString().replace('.', ',');
+    this.despesaSelecionada = despesa;
+    this.abrirDialogEdicaoDespesa = true;
+  }
+
+  public fecharDialogAlteracaoDespesa(): void {
+    this.abrirDialogEdicaoDespesa = false;
+    this.formularioAlteracaoDespesa = new AlteracaoDespesaFORM();
+    this.despesaSelecionada = new Despesa();
+  }
+
+  public eventoPerdaFocoValorDespesa(): void {
+    if (this.formularioAlteracaoDespesa.valor && this.formularioAlteracaoDespesa.valor !== '') {
+      const valorBolsa: string[] = this.formularioAlteracaoDespesa.valor.split(',');
+      
+      if (valorBolsa.length === 1) {
+        this.formularioAlteracaoDespesa.valor += ',00';
+      }
+      else if (valorBolsa.length === 2) {
+        if (valorBolsa[1] === '') {
+          this.formularioAlteracaoDespesa.valor += '00';
+        }
+        else if (valorBolsa.length === 2 && valorBolsa[1].length === 1) {
+          this.formularioAlteracaoDespesa.valor += '0';
+        }
+      }
+    }
+  }
+
+  public desabilitarBotaoConfirmarAlteracoesDaDespesa(): boolean {
+    return this.processandoEdicaoDespesa || !(this.formularioAlteracaoDespesa
+      && this.formularioAlteracaoDespesa.descricao && this.formularioAlteracaoDespesa.valor
+      && this.formularioAlteracaoDespesa.descricao !== this.despesaSelecionada.descricao
+      || this.formularioAlteracaoDespesa.valor !== this.despesaSelecionada.valor?.toString().replace('.', ','));
+  }
+
+  public exibirDialogpagarDespesa(despesa: Despesa): void {
+    this.despesaSelecionada = despesa;
+    this.abrirDialogPagamentoDespesa = true;
+  }
+
+  public fecharDialogPagamentoDespesa(): void {
+    this.abrirDialogPagamentoDespesa = false;
+    this.despesaSelecionada = new Despesa();
+  }
+
+  public exibirDialogExcluirDespesa(despesa: Despesa): void {
+    this.despesaSelecionada = despesa;
+    this.abrirDialogExclusaoDespesa = true;
+  }
+
+  public fecharDialogExclusaoDespesa(): void {
+    this.abrirDialogExclusaoDespesa = false;
+    this.despesaSelecionada = new Despesa();
   }
 }

@@ -8,7 +8,12 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { DialogModule } from 'primeng/dialog';
 import { TooltipModule } from 'primeng/tooltip';
 
+import { IConfig, NgxMaskModule } from 'ngx-mask';
+
 import { DespesaComponent } from './despesa.component';
+
+
+const maskConfig: Partial<IConfig> = { validation: false }
 
 @NgModule({
   declarations: [ DespesaComponent ],
@@ -20,6 +25,7 @@ import { DespesaComponent } from './despesa.component';
     ProgressSpinnerModule,
     DialogModule,
     TooltipModule,
+    NgxMaskModule.forRoot(maskConfig)
   ]
 })
 export class DespesaModule { }

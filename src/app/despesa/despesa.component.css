@@ -7,23 +7,3 @@
     margin-right: 8px;
     width: calc(100% - 28px);
 }
-
-.col-dataVencimento {
-    text-align: center;
-}
-
-.col-descricao {
-    text-align: center;
-}
-
-.col-valor {
-    text-align: center;
-}
-
-.col-situacao {
-    text-align: center;
-}
-
-.col-tipoDespesa {
-    text-align: center;
-}
