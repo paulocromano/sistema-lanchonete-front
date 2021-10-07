@@ -7,6 +7,8 @@ import { InputTextModule } from 'primeng/inputtext';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { DialogModule } from 'primeng/dialog';
 import { TooltipModule } from 'primeng/tooltip';
+import { CalendarModule } from 'primeng/calendar';
+import { DropdownModule } from 'primeng/dropdown';
 
 import { IConfig, NgxMaskModule } from 'ngx-mask';
 
@@ -25,6 +27,8 @@ const maskConfig: Partial<IConfig> = { validation: false }
     ProgressSpinnerModule,
     DialogModule,
     TooltipModule,
+    CalendarModule,
+    DropdownModule,
     NgxMaskModule.forRoot(maskConfig)
   ]
 })

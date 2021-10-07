@@ -92,7 +92,47 @@
     <p-header>Cadastrar Despesa</p-header>
 
     <div class="container-fluid">
+        <div class="row">
+            <div class="col-12 col-sm-6 mt-4">
+                <span class="p-float-label">
+                    <input type="text" style="width: 100%;" [(ngModel)]="formularioDespesa.descricao" pInputText> 
+                    <label for="inputtext">Descrição</label>
+                </span>
+            </div>
+            <div class="col-12 col-sm-6 mt-4">
+                <p-dropdown [options]="tiposDespesa" [(ngModel)]="tipoDespesaSelecionada" 
+                    placeholder="Tipos de Despesa" optionLabel="descricao"
+                    appendTo="body" [style]="{width: '100%'}">
+                </p-dropdown>
+            </div>
+        </div>
 
+        <div class="row">
+            <div class="col-12 col-sm-6 mt-4">
+                <span class="p-float-label">
+                    <input type="text" pInputText style="width: 130px;"
+                        [dropSpecialCharacters]="false" mask="0*,00"
+                        [(ngModel)]="formularioDespesa.valor"
+                        (blur)="eventoPerdaFocoValorCadastroDespesa()"/>
+                    <label for="inputtext">Preço</label>
+                </span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12 col-sm-6 mt-4">
+                <h5>Data do Pagamento</h5>
+                <p-calendar [dateFormat]="formatoCalendario.dateFormat" [inline]="true"
+                    [(ngModel)]="formularioDespesa.dataPagamento" [locale]="formatoCalendario">
+                </p-calendar>
+            </div>
+            <div class="col-12 col-sm-6 mt-4">
+                <h5>Data do Pagamento</h5>
+                <p-calendar dateFormat="dd/mm/yy" [inline]="true"
+                    [(ngModel)]="formularioDespesa.dataVencimento" [locale]="formatoCalendario">
+                </p-calendar>
+            </div>
+        </div>
     </div>
 
     <p-footer>
@@ -101,7 +141,7 @@
             Voltar
         </button>
         <button class="btn btn-success" [disabled]="desabilitarBotaoConfirmarCadastroDespesa()" 
-            (click)="alterarDespesa()">
+            (click)="cadastrarDespesa()">
             <i class="fas " [ngClass]="processandoCadastroDespesa ? 'fa-spin fa-circle-notch' : 'fa-check-circle'"></i>
             Confirmar
          </button>
@@ -150,7 +190,7 @@
                 <input type="text" pInputText style="width: 130px;"
                     [dropSpecialCharacters]="false" mask="0*,00"
                     [(ngModel)]="formularioAlteracaoDespesa.valor"
-                    (blur)="eventoPerdaFocoValorDespesa()"/>
+                    (blur)="eventoPerdaFocoValorAlteracaoDespesa()"/>
                 <label for="inputtext">Valor R$</label>
             </span>
         </div>

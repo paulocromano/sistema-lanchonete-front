@@ -6,6 +6,7 @@ import { ServidorService } from 'src/app/shared/service/servidor.service';
 import { Despesa } from '../model/despesa.model';
 import { DespesaFORM } from '../model/despesa.form';
 import { AlteracaoDespesaFORM } from '../model/alteracao-despesa.form';
+import { InformacoesCadastroDespesa } from '../model/informacoes-cadastro-despesa.model';
 
 @Injectable({
   providedIn: 'root'
@@ -18,6 +19,10 @@ export class DespesaService {
 
   public listarDespesas(): Observable<Despesa[]> {
     return this.http.get<Despesa[]>(this.baseUrl);
+  }
+
+  public buscarInformacoesParaCadastroDespesa(): Observable<InformacoesCadastroDespesa> {
+    return this.http.get<InformacoesCadastroDespesa>(`${this.baseUrl}/informacoes-para-cadastro`);
   }
 
   public cadastrarDespesa(formularioDespesa: DespesaFORM): Observable<any> {

@@ -7,6 +7,8 @@ import { DespesaService } from './shared/service/despesa.service';
 import { Despesa } from './shared/model/despesa.model';
 import { DespesaFORM } from './shared/model/despesa.form';
 import { AlteracaoDespesaFORM } from './shared/model/alteracao-despesa.form';
+import { InformacoesCadastroDespesa } from './shared/model/informacoes-cadastro-despesa.model';
+import { DadosEnum } from './shared/model/dados-enum.model';
 
 @Component({
   selector: 'app-despesa',
@@ -19,9 +21,12 @@ export class DespesaComponent implements OnInit {
   public despesaSelecionada: Despesa = new Despesa();
   public formularioDespesa: DespesaFORM = new DespesaFORM();
   public formularioAlteracaoDespesa: AlteracaoDespesaFORM = new AlteracaoDespesaFORM();
+  public tipoDespesaSelecionada: DadosEnum = new DadosEnum();
+  public tiposDespesa: DadosEnum[] = [];
 
   public colunasTabela: any;
   public inputPesquisa: string;
+  public formatoCalendario: any;
 
   public abrirDialogCadastro: boolean = false; 
   public abrirDialogInformacoesDespesa: boolean = false;
@@ -42,7 +47,13 @@ export class DespesaComponent implements OnInit {
 
   ngOnInit(): void {
     this.definirColunasTabela();
+    this.carregarFormatoDoCalendario();
+    this.buscarInformacoesParaCadastroDespesa();
     this.listarDespesas();
+  }
+
+  public se($e): void {
+    console.log($e)
   }
 
   private definirColunasTabela(): void {
@@ -55,6 +66,34 @@ export class DespesaComponent implements OnInit {
       { header: 'Ações', field: 'acoes', style: 'col-acoes' }
     ];
   }
+
+  private carregarFormatoDoCalendario(){
+    this.formatoCalendario = {
+      firstDayOfWeek: 0,
+      dayNames: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'],
+      dayNamesShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'],
+      dayNamesMin: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'],
+      monthNames: [
+          'Janeiro',
+          'Fevereiro',
+          'Março',
+          'Abril',
+          'Maio',
+          'Junho',
+          'Julho',
+          'Agosto',
+          'Setembro',
+          'Outubro',
+          'Novembro',
+          'Dezembro'
+      ],
+      monthNamesShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+      today: 'Hoje',
+      clear: 'Limpar',
+      dateFormat: 'dd/mm/yy'
+    };
+  }
+
 
   public formatarData(dataCadastro: Date): string {
     if (dataCadastro)  {
@@ -78,6 +117,16 @@ export class DespesaComponent implements OnInit {
       });
   }
 
+  private buscarInformacoesParaCadastroDespesa(): void {
+    this.despesaService.buscarInformacoesParaCadastroDespesa()
+      .subscribe((informacoesCadastro: InformacoesCadastroDespesa) => {
+        this.tiposDespesa = informacoesCadastro.tiposDespesa;
+      },
+      () => {
+        this.toastrService.error('Erro ao buscar as informações para cadastro de despesa')!
+      });
+  }
+
   public exibirDialogCadastro(): void {
     this.abrirDialogCadastro = true;
   }
@@ -88,16 +137,21 @@ export class DespesaComponent implements OnInit {
   }
 
   public desabilitarBotaoConfirmarCadastroDespesa(): boolean {
-    return;
+    return this.processandoCadastroDespesa || !(this.formularioDespesa
+      && this.formularioDespesa.descricao && this.tipoDespesaSelecionada
+      && this.formularioDespesa.valor && this.formularioDespesa.dataVencimento);
   }
 
   public cadastrarDespesa(): void {
     this.processandoCadastroDespesa = true;
+    this.formularioDespesa.tipoDespesa = this.tipoDespesaSelecionada.codigo;
+    this.formularioDespesa.valor =  this.formularioDespesa.valor.toString().replace(',', '.');
 
     this.despesaService.cadastrarDespesa(this.formularioDespesa)
       .subscribe(() => {
         this.processandoCadastroDespesa = false;
         this.toastrService.success('Despesa cadastrada com sucesso!');
+        this.fecharDialogCadastro();
         this.listarDespesas();
       },
       (error: HttpErrorResponse) => {
@@ -190,7 +244,25 @@ export class DespesaComponent implements OnInit {
     this.despesaSelecionada = new Despesa();
   }
 
-  public eventoPerdaFocoValorDespesa(): void {
+  public eventoPerdaFocoValorCadastroDespesa(): void {
+    if (this.formularioDespesa.valor && this.formularioDespesa.valor !== '') {
+      const valorBolsa: string[] = this.formularioDespesa.valor.split(',');
+      
+      if (valorBolsa.length === 1) {
+        this.formularioDespesa.valor += ',00';
+      }
+      else if (valorBolsa.length === 2) {
+        if (valorBolsa[1] === '') {
+          this.formularioDespesa.valor += '00';
+        }
+        else if (valorBolsa.length === 2 && valorBolsa[1].length === 1) {
+          this.formularioDespesa.valor += '0';
+        }
+      }
+    }
+  }
+
+  public eventoPerdaFocoValorAlteracaoDespesa(): void {
     if (this.formularioAlteracaoDespesa.valor && this.formularioAlteracaoDespesa.valor !== '') {
       const valorBolsa: string[] = this.formularioAlteracaoDespesa.valor.split(',');
       

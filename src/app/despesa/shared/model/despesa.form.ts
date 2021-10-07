@@ -2,8 +2,7 @@ export class DespesaFORM {
     
     descricao: string;
 	tipoDespesa: string;
-	valor: number;
-	situacao: string;
+	valor: string;
 	dataPagamento: Date;
 	dataVencimento: Date;
 }
