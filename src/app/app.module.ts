@@ -14,6 +14,8 @@ import { FornecedorModule } from './fornecedor/fornecedor.module';
 import { RelatorioGraficoModule } from './relatorio-grafico/relatorio-grafico.module';
 import { LancheModule } from './lanche/lanche.module';
 import { DespesaModule } from './despesa/despesa.module';
+import { MesaModule } from './mesa/mesa.module';
+import { ProdutoModule } from './produto/produto.module';
 
 
 const maskConfig: Partial<IConfig> = { validation: false }
@@ -32,6 +34,8 @@ const maskConfig: Partial<IConfig> = { validation: false }
     LancheModule,
     RelatorioGraficoModule,
     DespesaModule,
+    MesaModule,
+    ProdutoModule,
     ToastrModule.forRoot({
       timeOut: 4000,
       positionClass: 'toast-bottom-right',
