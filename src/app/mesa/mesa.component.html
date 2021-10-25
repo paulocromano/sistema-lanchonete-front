@@ -1,1 +1,151 @@
-<p>mesa works!</p>
+<div class="container mt-5">
+    <h2 class="text-center">Mesas</h2>
+
+    <div class="borda-table mt-3">
+        <p-table #dataView [value]="mesas" [columns]="colunasTabela" [responsive]="true" [rows]="8" 
+            [paginator]="true" class="text-center">
+
+            <ng-template pTemplate="caption">
+                <div class="row">
+                    <div class="col-12 col-sm-6 col-md-6 col-lg-4">
+                        <input type="text" pInputText placeholder="Pesquisa" class="pesquisa" [(ngModel)]="inputPesquisa"
+                            (input)="dataView.filterGlobal($event.target.value, 'contains')">
+                        <i class="fas fa-search" style="font-size: 1.18em;"></i>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-md-6 col-lg-8 text-right">
+                        <button class="btn btn-success px-5" (click)="exibirDialogCadastro()">
+                            <i class="fas fa-plus"></i>
+                            Cadastrar Mesa
+                        </button>
+                    </div>
+                </div>
+            </ng-template>
+
+            <ng-template pTemplate="header" let-colunas>
+                <tr>
+                    <th *ngFor="let coluna of colunas" [pSortableColumn]="coluna.ordenavel ? coluna.field : null" [ngClass]="coluna.style" class="text-center">
+                        {{ coluna.header }}
+                        <p-sortIcon *ngIf="coluna.header !== 'Ações'" [field]="coluna.field"></p-sortIcon>
+                    </th>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-mesa>
+                <tr>
+                    <td *ngFor="let coluna of colunasTabela" class="text-center">
+                        <span class="ui-column-title text-left">{{ mesa[coluna.field] }}</span>
+
+                        <span *ngIf="coluna.header === 'Ações'">
+                            <button class="btn btn-warning" pTooltip="Editar" tooltipPosition="bottom"
+                                (click)="armazenarMesaParaEdicao(mesa)">
+                                <i class="fas fa-pen text-light"></i>
+                            </button>
+
+                            <button class="btn btn-danger ml-2" pTooltip="Excluir" tooltipPosition="bottom"
+                                (click)="armazenarMesaParaExclusao(mesa)">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </span>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage" class="text-center" let-mesas>
+                <tr>
+                    <td [attr.colspan]="mesas.length" class="text-center">
+                        <span *ngIf="!processandoOperacaoListagem">
+                            {{ inputPesquisa ? 'Nenhuma mesa corresponde à pesquisa!' : 'Nenhuma mesa encontrada!' }}
+                        </span>
+
+                        <span *ngIf="processandoOperacaoListagem && !inputPesquisa">
+                            <p-progressSpinner strokeWidth="3"></p-progressSpinner>
+                        </span>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="summary">
+                Mesas encontradas: {{ mesas ? mesas.length : 0 }}
+            </ng-template>
+        </p-table>
+    </div>
+</div>
+
+<!-- Dialog cadastro de Mesa -->
+<p-dialog [visible]="abrirDialogCadastro" [modal]="true" [blockScroll]="true" 
+    [draggable]="false" [closable]="false" [style]="{width: '30vw'}">
+
+    <p-header>Cadastrar Mesa</p-header>
+
+    <div class="container-fluid mt-4">
+        <span class="p-float-label">
+            <p-inputNumber [(ngModel)]="formularioMesa.numero" [min]="1" [showButtons]="true"></p-inputNumber>
+            <label for="inputtext">Número</label>
+        </span>
+    </div>
+
+    <p-footer>
+        <button class="btn btn-danger" (click)="fecharDialogCadastroMesa()">
+            <i class="fas fa-arrow-circle-left"></i>
+            Voltar
+        </button>
+
+        <button class="btn btn-success" [disabled]="desabilitarBotaoCadastroMesa()" 
+            (click)="cadastrarMesa()">
+            <i class="fas " [ngClass]="processandoCadastroMesa ? 'fa-spin fa-circle-notch' : 'fa-check-circle'"></i>
+            Confirmar
+        </button>
+    </p-footer>
+</p-dialog>
+
+<!-- Dialog edição de Mesa -->
+<p-dialog [visible]="abrirDialogEdicaoMesa" [modal]="true" [blockScroll]="true" 
+    [draggable]="false" [closable]="false" [style]="{width: '30vw'}">
+
+    <p-header>Alterar Dados da Mesa</p-header>
+
+    <div class="container-fluid text-center">
+        <div class="mb-4">A mesa <b>{{ mesaSelecionada.numero }}</b> está disponível?</div>
+
+        <p-radioButton value="S" [(ngModel)]="formularioAlteracaoDadosMesa.mesaAtiva"></p-radioButton> Sim
+        <p-radioButton class="ml-2" value="N" [(ngModel)]="formularioAlteracaoDadosMesa.mesaAtiva"></p-radioButton> Não
+    </div>
+
+    <p-footer>
+        <button class="btn btn-danger" (click)="fecharDialogEdicaoMesa()">
+            <i class="fas fa-arrow-circle-left"></i>
+            Voltar
+        </button>
+
+        <button class="btn btn-success" [disabled]="desabilitarBotaoEdicaoMesa()" 
+            (click)="alterarDadosMesa()">
+            <i class="fas " [ngClass]="processandoEdicaoMesa ? 'fa-spin fa-circle-notch' : 'fa-check-circle'"></i>
+            Confirmar
+        </button>
+    </p-footer>
+</p-dialog>
+
+<!-- Dialog exclusão de Mesa -->
+<p-dialog [visible]="abrirDialogExclusaoMesa" [modal]="true" [blockScroll]="true" 
+    [draggable]="false" [closable]="false" [style]="{width: '30vw'}">
+
+    <p-header>Excluir Mesa</p-header>
+
+    <div class="container-fluid">
+        Tem certeza que deseja excluir a mesa <b>{{ mesaSelecionada.numero }}</b>?
+    </div>
+
+    <p-footer>
+        <button class="btn btn-danger" (click)="fecharDialogExclusaoMesa()">
+            <i class="fas fa-arrow-circle-left"></i>
+            Voltar
+        </button>
+
+        <button class="btn btn-success" [disabled]="processandoExclusaoMesa" 
+            (click)="excluirMesa()">
+            <i class="fas " [ngClass]="processandoExclusaoMesa ? 'fa-spin fa-circle-notch' : 'fa-check-circle'"></i>
+            Confirmar
+        </button>
+    </p-footer>
+</p-dialog>

@@ -1,1 +1,278 @@
-<p>produto works!</p>
+<div class="container-fluid mt-5">
+    <h2 class="text-center">Produtos</h2>
+
+    <div class="borda-table mt-3">
+        <p-table #dataView [value]="produtos" [columns]="colunasTabela" [responsive]="true" [rows]="8" 
+            [paginator]="true" class="text-center">
+
+            <ng-template pTemplate="caption">
+                <div class="row">
+                    <div class="col-12 col-sm-6 col-md-6 col-lg-4">
+                        <input type="text" pInputText placeholder="Pesquisa" class="pesquisa" [(ngModel)]="inputPesquisa"
+                            (input)="dataView.filterGlobal($event.target.value, 'contains')">
+                        <i class="fas fa-search" style="font-size: 1.18em;"></i>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-md-6 col-lg-8 text-right">
+                        <button class="btn btn-success px-5" (click)="exibirDialogCadastro()"
+                            [disabled]="processandoFornecedoresParaCadastroDeProduto">
+                            <i class="fas fa-plus"></i>
+                            Cadastrar Produto
+                        </button>
+                    </div>
+                </div>
+            </ng-template>
+
+            <ng-template pTemplate="header" let-colunas>
+                <tr>
+                    <th *ngFor="let coluna of colunas" [pSortableColumn]="coluna.ordenavel ? coluna.field : null" [ngClass]="coluna.style" class="text-center">
+                        {{ coluna.header }}
+                        <p-sortIcon *ngIf="coluna.header !== 'Ações'" [field]="coluna.field"></p-sortIcon>
+                    </th>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-produto>
+                <tr>
+                    <td *ngFor="let coluna of colunasTabela" class="text-center">
+                        <span class="ui-column-title text-left">{{ produto[coluna.field] }}</span>
+
+                        <span *ngIf="coluna.header === 'Ações'">
+                            <button class="btn btn-info mr-2 px-3" pTooltip="Informações" tooltipPosition="bottom"
+                                (click)="armazenarProdutoParaVisualizarInformacoes(produto)">
+                                <i class="fas fa-info text-light"></i>
+                            </button>
+        
+                            <button class="btn btn-warning" pTooltip="Editar" tooltipPosition="bottom"
+                                (click)="armazenarProdutoParaEdicao(produto)">
+                                <i class="fas fa-pen text-light"></i>
+                            </button>
+        
+                            <button class="btn btn-danger ml-2" pTooltip="Excluir" tooltipPosition="bottom"
+                                (click)="armazenarProdutoParaExclusao(produto)">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </span>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage" class="text-center" let-produtos>
+                <tr>
+                    <td [attr.colspan]="produtos.length" class="text-center">
+                        <span *ngIf="!processandoOperacaoListagem">
+                            {{ inputPesquisa ? 'Nenhum produto corresponde à pesquisa!' : 'Nenhum produto encontrado!' }}
+                        </span>
+
+                        <span *ngIf="processandoOperacaoListagem && !inputPesquisa">
+                            <p-progressSpinner strokeWidth="3"></p-progressSpinner>
+                        </span>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="summary">
+                Produtos encontrados: {{ produtos ? produtos.length : 0 }}
+            </ng-template>
+        </p-table>
+    </div>
+</div>
+
+<!-- Dialog de informações do Produto -->
+<p-dialog [visible]="abrirDialogInformacoesProduto" [modal]="true" [blockScroll]="true" 
+    [draggable]="false" [closable]="false" [style]="{width: '35vw'}">
+
+    <p-header>Informações do Produto</p-header>
+
+    <div class="container-fluid">
+        <hr>
+        <h5>Empresa</h5>
+        <div><b>Nome da Empresa: </b>{{ produtoSelecionado.fornecedor.nomeEmpresa }}</div>
+        <div><b>CNPJ: </b>{{ produtoSelecionado.fornecedor.cnpj }}</div>
+        <hr>
+
+        <div class="mt-3"><b>Descrição do Produto: </b>{{ produtoSelecionado.descricao }}</div>
+        <div><b>Tipo do Produto: </b>{{ produtoSelecionado.tipoProduto }}</div>
+        <div><b>Preço R$: </b>{{ produtoSelecionado.preco }}</div>
+        <div><b>Quantidade: </b>{{ produtoSelecionado.quantidade }}</div>
+        <div><b>Estoque Mínimo: </b>{{ produtoSelecionado.quantidadeMinimaEstoque }}</div>
+        <div><b>Data do Cadastro: </b>{{ produtoSelecionado.dataCadastro }}</div>
+        <div><b>Data da Última Atualização: </b>{{ produtoSelecionado.dataUltimaAtualizacao }}</div>
+    </div>
+
+    <p-footer>
+        <button class="btn btn-danger" (click)="fecharDialogVisualizacaoProduto()">
+            <i class="fas fa-arrow-circle-left"></i>
+            Voltar
+        </button>
+    </p-footer>
+</p-dialog>
+
+<!-- Dialog cadastro de Produto -->
+<p-dialog [visible]="abrirDialogCadastro" [modal]="true" [blockScroll]="true" 
+    [draggable]="false" [closable]="false" [style]="{width: '50vw'}">
+
+    <p-header>Cadastrar Produto</p-header>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12 col-md-6 mt-4">
+                <span class="p-float-label">
+                    <p-dropdown [options]="forncedoresDropdown" [(ngModel)]="formularioProduto.idFornecedor"
+                        [filter]="true" [emptyFilterMessage]="'Nenhum fornecedor corresponde à pesquisa!'"
+                        [style]="{width: '100%'}">
+                    </p-dropdown>
+                    <label for="inputtext">Selecione um Fornecedor</label>
+                </span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12 col-md-6 mt-4">
+                <span class="p-float-label">
+                    <input type="text" style="width: 100%;" [(ngModel)]="formularioProduto.descricao" pInputText> 
+                    <label for="inputtext">Descrição do Produto</label>
+                </span>
+            </div>
+            <div class="col-12 col-md-6 mt-4">
+                <span class="p-float-label">
+                    <p-inputNumber [(ngModel)]="formularioProduto.preco" mode="currency" currency="BRL" locale="pt-BR"></p-inputNumber>
+                    <label for="inputtext">Preço</label>
+                </span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12 mt-4">
+                <span class="mr-5"><b>Tipo do Produto:</b></span>
+                <p-radioButton value="1" [(ngModel)]="formularioProduto.tipoProduto"></p-radioButton> Bebida
+                <p-radioButton class="ml-2" value="2" [(ngModel)]="formularioProduto.tipoProduto"></p-radioButton> Alimentício
+                <p-radioButton class="ml-2" value="3" [(ngModel)]="formularioProduto.tipoProduto"></p-radioButton> Não Alimentício
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12 col-md-6 mt-4">
+                <span class="p-float-label">
+                    <p-inputNumber [(ngModel)]="formularioProduto.quantidade" [min]="1" [showButtons]="true"></p-inputNumber>
+                    <label for="inputtext">Quantidade</label>
+                </span>
+            </div>
+            <div class="col-12 col-md-6 mt-4">
+                <span class="p-float-label">
+                    <p-inputNumber [(ngModel)]="formularioProduto.quantidadeMinimaEstoque" [min]="1" [showButtons]="true"></p-inputNumber>
+                    <label for="inputtext">Estoque Mínimo</label>
+                </span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12 mt-4">
+                <span class="p-float-label">
+                    <textarea pInputTextarea [(ngModel)]="formularioProduto.descricaoEstoque"
+                        [rows]="2" [style]="{width: '100%'}">
+                    </textarea>
+                    <label for="inputtext">Descrição do Estoque</label>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <p-footer>
+        <button class="btn btn-danger" (click)="fecharDialogCadastroProduto()">
+            <i class="fas fa-arrow-circle-left"></i>
+            Voltar
+        </button>
+
+        <button class="btn btn-success" [disabled]="desabilitarBotaoCadastroProduto()" 
+            (click)="cadastrarProduto()">
+            <i class="fas " [ngClass]="processandoCadastroProduto ? 'fa-spin fa-circle-notch' : 'fa-check-circle'"></i>
+            Confirmar
+        </button>
+    </p-footer>
+</p-dialog>
+
+<!-- Dialog edição de Produto -->
+<p-dialog [visible]="abrirDialogEdicaoProduto" [modal]="true" [blockScroll]="true" 
+    [draggable]="false" [closable]="false" [style]="{width: '50vw'}">
+
+    <p-header>Alterar Dados do Produto</p-header>
+
+    <div class="contaienr-fluid">
+        <div class="row">
+            <div class="col-12 mt-4">
+                <span class="p-float-label">
+                    <p-inputNumber [(ngModel)]="formularioAlteracaoDadosProduto.preco" 
+                        mode="currency" currency="BRL" locale="pt-BR">
+                    </p-inputNumber>
+                    <label for="inputtext">Preço</label>
+                </span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12 col-md-6 mt-4">
+                <span class="p-float-label">
+                    <p-inputNumber [(ngModel)]="formularioAlteracaoDadosProduto.quantidade" [min]="1" [showButtons]="true"></p-inputNumber>
+                    <label for="inputtext">Quantidade</label>
+                </span>
+            </div>
+            <div class="col-12 col-md-6 mt-4">
+                <span class="p-float-label">
+                    <p-inputNumber [(ngModel)]="formularioAlteracaoDadosProduto.quantidadeMinimaEstoque" 
+                        [min]="1" [showButtons]="true">
+                    </p-inputNumber>
+                    <label for="inputtext">Estoque Mínimo</label>
+                </span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12 mt-4">
+                <span class="p-float-label">
+                    <textarea pInputTextarea [(ngModel)]="formularioAlteracaoDadosProduto.descricaoEstoque"
+                        [rows]="2" [style]="{width: '100%'}">
+                    </textarea>
+                    <label for="inputtext">Descrição do Estoque</label>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <p-footer>
+        <button class="btn btn-danger" (click)="fecharDialogEdicaoProduto()">
+            <i class="fas fa-arrow-circle-left"></i>
+            Voltar
+        </button>
+
+        <button class="btn btn-success" [disabled]="desabilitarBotaoAlteracaoDadosDoProduto()" 
+            (click)="alterarDadosProduto()">
+            <i class="fas " [ngClass]="processandoEdicaoProduto ? 'fa-spin fa-circle-notch' : 'fa-check-circle'"></i>
+            Confirmar
+        </button>
+    </p-footer>
+</p-dialog>
+
+<!-- Dialog edição de Produto -->
+<p-dialog [visible]="abrirDialogExclusaoProduto" [modal]="true" [blockScroll]="true" 
+    [draggable]="false" [closable]="false" [style]="{width: '30vw'}">
+
+    <p-header>Excluir Produto</p-header>
+
+    <div class="container-fluid">
+        Tem certeza que deseja excluir o produto <b>{{ produtoSelecionado.descricao }}</b>?
+    </div>
+
+    <p-footer>
+        <button class="btn btn-danger" (click)="fecharDialogExclusaoProduto()">
+            <i class="fas fa-arrow-circle-left"></i>
+            Voltar
+        </button>
+
+        <button class="btn btn-success" [disabled]="processandoExclusaoProduto" 
+            (click)="excluirProduto()">
+            <i class="fas " [ngClass]="processandoExclusaoProduto ? 'fa-spin fa-circle-notch' : 'fa-check-circle'"></i>
+            Confirmar
+        </button>
+    </p-footer>
+</p-dialog>

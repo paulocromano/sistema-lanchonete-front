@@ -6,8 +6,8 @@ export class Produto {
     descricao: string;
     preco: string;
     tipoProduto: string;
-    quantidade: string;
-    quantidadeMinimaEstoque: string;
+    quantidade: number;
+    quantidadeMinimaEstoque: number;
     descricaoEstoque: string;
     dataCadastro: string;
     dataUltimaAtualizacao: string;

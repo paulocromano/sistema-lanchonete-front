@@ -1,0 +1,92 @@
+<div class="container-fluid mt-5">
+    <h2 class="text-center">Pedidos</h2>
+
+    <div class="borda-table mt-3">
+        <p-table #dataView [value]="pedidos" [columns]="colunasTabela" [responsive]="true" [rows]="8" 
+            [paginator]="true" class="text-center">
+
+            <ng-template pTemplate="caption">
+                <div class="row">
+                    <div class="col-12 col-sm-6 col-md-6 col-lg-4">
+                        <input type="text" pInputText placeholder="Pesquisa" class="pesquisa" [(ngModel)]="inputPesquisa"
+                            (input)="dataView.filterGlobal($event.target.value, 'contains')">
+                        <i class="fas fa-search" style="font-size: 1.18em;"></i>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-md-6 col-lg-8 text-right">
+                        <button class="btn btn-success px-5" (click)="exibirDialogCadastro()">
+                            <i class="fas fa-plus"></i>
+                            Cadastrar Pedido
+                        </button>
+                    </div>
+                </div>
+            </ng-template>
+
+            <ng-template pTemplate="header" let-colunas>
+                <tr>
+                    <th *ngFor="let coluna of colunas" [pSortableColumn]="coluna.ordenavel ? coluna.field : ''" [ngClass]="coluna.style" class="text-center">
+                        {{ coluna.header }}
+                        <p-sortIcon *ngIf="coluna.ordenavel" [field]="coluna.field"></p-sortIcon>
+                    </th>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-pedido>
+                <tr>
+                    <td *ngFor="let coluna of colunasTabela" class="text-center">
+                        <span class="ui-column-title text-left">{{ pedido[coluna.field] }}</span>
+
+                        <span *ngIf="coluna.header === 'Ações'">
+                            <button class="btn btn-info mr-2 px-3" pTooltip="Informações" tooltipPosition="bottom"
+                                (click)="armazenarPedidoParaVisualizarInformacoes(pedido)">
+                                <i class="fas fa-info text-light"></i>
+                            </button>
+                        </span>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage" class="text-center" let-pedidos>
+                <tr>
+                    <td [attr.colspan]="pedidos.length" class="text-center">
+                        <span *ngIf="!processandoOperacaoListagem">
+                            {{ inputPesquisa ? 'Nenhum Pedido corresponde à pesquisa!' : 'Nenhum Pedido encontrado!' }}
+                        </span>
+
+                        <span *ngIf="processandoOperacaoListagem && !inputPesquisa">
+                            <p-progressSpinner strokeWidth="3"></p-progressSpinner>
+                        </span>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="summary">
+                Pedidos Encontrados: {{ pedidos ? pedidos.length : 0 }}
+            </ng-template>
+        </p-table>
+    </div>
+</div>
+
+<!-- Dialog cadastro de Pedido -->
+<p-dialog [visible]="abrirDialogCadastro" [modal]="true" [blockScroll]="true" 
+    [draggable]="false" [closable]="false" [style]="{width: '70vw'}">
+
+    <p-header>Cadastrar Pedido</p-header>
+
+    <div class="container-fluid">
+
+    </div>
+
+    <p-footer>
+        <button class="btn btn-danger" (click)="fecharDialogCadastroPedido()">
+            <i class="fas fa-arrow-circle-left"></i>
+            Voltar
+        </button>
+
+        <button class="btn btn-success" [disabled]="desabilitarBotaoCadastroPedido()" 
+            (click)="cadastrarPedido()">
+            <i class="fas " [ngClass]="processandoCadastroPedido ? 'fa-spin fa-circle-notch' : 'fa-check-circle'"></i>
+            Confirmar
+        </button>
+    </p-footer>
+</p-dialog>

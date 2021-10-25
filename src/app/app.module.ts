@@ -16,6 +16,7 @@ import { LancheModule } from './lanche/lanche.module';
 import { DespesaModule } from './despesa/despesa.module';
 import { MesaModule } from './mesa/mesa.module';
 import { ProdutoModule } from './produto/produto.module';
+import { PedidoModule } from './pedido/pedido.module';
 
 
 const maskConfig: Partial<IConfig> = { validation: false }
@@ -36,6 +37,7 @@ const maskConfig: Partial<IConfig> = { validation: false }
     DespesaModule,
     MesaModule,
     ProdutoModule,
+    PedidoModule,
     ToastrModule.forRoot({
       timeOut: 4000,
       positionClass: 'toast-bottom-right',

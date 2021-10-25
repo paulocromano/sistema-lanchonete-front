@@ -6,6 +6,7 @@ import { DespesaComponent } from './despesa/despesa.component';
 import { FornecedorComponent } from './fornecedor/fornecedor.component';
 import { LancheComponent } from './lanche/lanche.component';
 import { MesaComponent } from './mesa/mesa.component';
+import { PedidoComponent } from './pedido/pedido.component';
 import { ProdutoComponent } from './produto/produto.component';
 import { RelatorioGraficoComponent } from './relatorio-grafico/relatorio-grafico.component';
 
@@ -16,7 +17,8 @@ const routes: Routes = [
   { path: 'relatorios-graficos', component: RelatorioGraficoComponent },
   { path: 'despesas', component: DespesaComponent },
   { path: 'mesas', component: MesaComponent },
-  { path: 'produtos', component: ProdutoComponent }
+  { path: 'produtos', component: ProdutoComponent },
+  { path: 'pedidos', component: PedidoComponent }
 ];
 
 @NgModule({

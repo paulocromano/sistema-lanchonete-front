@@ -20,8 +20,8 @@ export class MesaService {
     return this.http.get<Mesa[]>(this.baseUrl);
   }
 
-  public buscarMesasDisponiveis(): Observable<Mesa[]> {
-    return this.http.get<Mesa[]>(`${this.baseUrl}/disponivel`);
+  public buscarMesasAtivas(): Observable<Mesa[]> {
+    return this.http.get<Mesa[]>(`${this.baseUrl}/ativa`);
   }
 
   public cadastrarMesa(formularioMesa: MesaFORM): Observable<any> {
