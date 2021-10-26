@@ -8,6 +8,9 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { DialogModule } from 'primeng/dialog';
 import { TooltipModule } from 'primeng/tooltip';
 import { DropdownModule } from 'primeng/dropdown';
+import { RadioButtonModule } from 'primeng/radiobutton';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { InputTextareaModule } from 'primeng/inputtextarea';
 
 import { PedidoComponent } from './pedido.component';
 
@@ -21,7 +24,10 @@ import { PedidoComponent } from './pedido.component';
     ProgressSpinnerModule,
     DialogModule,
     TooltipModule,
-    DropdownModule
+    DropdownModule,
+    RadioButtonModule,
+    InputNumberModule,
+    InputTextareaModule
   ]
 })
 export class PedidoModule { }

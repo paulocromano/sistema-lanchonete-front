@@ -34,12 +34,27 @@
             <ng-template pTemplate="body" let-pedido>
                 <tr>
                     <td *ngFor="let coluna of colunasTabela" class="text-center">
-                        <span class="ui-column-title text-left">{{ pedido[coluna.field] }}</span>
+                        <span *ngIf="coluna.header !== 'Cliente'" class="ui-column-title text-left">{{ pedido[coluna.field] }}</span>
+                        <span *ngIf="coluna.header === 'Cliente'" class="ui-column-title text-left">
+                            {{ pedido[coluna.field] ? pedido[coluna.field].nome : '---' }}
+                        </span>
 
                         <span *ngIf="coluna.header === 'Ações'">
                             <button class="btn btn-info mr-2 px-3" pTooltip="Informações" tooltipPosition="bottom"
                                 (click)="armazenarPedidoParaVisualizarInformacoes(pedido)">
                                 <i class="fas fa-info text-light"></i>
+                            </button>
+                            <button class="btn btn-warning mr-2" pTooltip="Adicionar Lanche" tooltipPosition="bottom"
+                                (click)="armazenarPedidoParaAdicionarLanche(pedido)">
+                                <i class="fas fa-hamburger"></i>
+                            </button>
+                            <button class="btn btn-secondary mr-2" pTooltip="Adicionar Bebida" tooltipPosition="bottom"
+                                (click)="armazenarPedidoParaAdicionarBebida(pedido)">
+                                <i class="fas fa-wine-bottle"></i>
+                            </button>
+                            <button class="btn btn-danger" pTooltip="Excluir" tooltipPosition="bottom"
+                                (click)="armazenarPedidoParaExclusao(pedido)">
+                                <i class="fas fa-trash-alt"></i>
                             </button>
                         </span>
                     </td>
@@ -69,12 +84,39 @@
 
 <!-- Dialog cadastro de Pedido -->
 <p-dialog [visible]="abrirDialogCadastro" [modal]="true" [blockScroll]="true" 
-    [draggable]="false" [closable]="false" [style]="{width: '70vw'}">
+    [draggable]="false" [closable]="false" [style]="{width: '50vw'}">
 
     <p-header>Cadastrar Pedido</p-header>
 
     <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <span class="mr-3"><b>Para entrega?</b></span>
+                <p-radioButton class="ml-2" value="S" label="Sim" [(ngModel)]="formularioPedido.entrega"></p-radioButton>
+                <p-radioButton class="ml-2" value="N" label="Não" [(ngModel)]="formularioPedido.entrega"></p-radioButton>
+            </div>
+        </div>
 
+        <div class="row" style="margin-bottom: 130px;">
+            <div class="col-md-4 mt-5">
+                <span class="p-float-label">
+                    <p-dropdown [options]="mesasDropdown" [(ngModel)]="formularioPedido.idMesa"
+                        [filter]="true" [emptyFilterMessage]="'Nenhuma mesa corresponde à pesquisa!'"
+                        [disabled]="formularioPedido.entrega === 'S'" [style]="{width: '100%'}">
+                    </p-dropdown>
+                    <label for="inputtext">Selecione uma Mesa</label>
+                </span>
+            </div>
+            <div class="col-md-8 mt-5">
+                <span class="p-float-label">
+                    <p-dropdown [options]="clientesDropdown" [(ngModel)]="formularioPedido.idCliente"
+                        [filter]="true" [emptyFilterMessage]="'Nenhum cliente corresponde à pesquisa!'"
+                        [style]="{width: '100%'}">
+                    </p-dropdown>
+                    <label for="inputtext">Selecione um Cliente</label>
+                </span>
+            </div>
+        </div>
     </div>
 
     <p-footer>
@@ -86,6 +128,153 @@
         <button class="btn btn-success" [disabled]="desabilitarBotaoCadastroPedido()" 
             (click)="cadastrarPedido()">
             <i class="fas " [ngClass]="processandoCadastroPedido ? 'fa-spin fa-circle-notch' : 'fa-check-circle'"></i>
+            Confirmar
+        </button>
+    </p-footer>
+</p-dialog>
+
+<!-- Dialog informações do Pedido -->
+<p-dialog [visible]="abrirDialogInformacoesPedido" [modal]="true" [blockScroll]="true" 
+    [draggable]="false" [closable]="false" [style]="{width: '96vw'}">
+
+    <p-header>Informações do Pedido</p-header>
+
+    <div class="container-fluid">
+
+    </div>
+
+    <p-footer>
+        <button class="btn btn-danger" (click)="fecharDialogInformacoesPedido()">
+            <i class="fas fa-arrow-circle-left"></i>
+            Voltar
+        </button>
+    </p-footer>
+</p-dialog>
+
+<!-- Dialog adicionar lanche ao Pedido -->
+<p-dialog [visible]="abrirDialogAdicaoLancheNoPedido" [modal]="true" [blockScroll]="true" 
+    [draggable]="false" [closable]="false" [style]="{width: '70vw'}">
+
+    <p-header>Adicionar Lanche ao Pedido <b>{{ pedidoSelecionado.id }}</b></p-header>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12 col-lg-8 mt-4">
+                <span class="p-float-label">
+                    <p-dropdown [options]="lanchesDropdown" [(ngModel)]="formularioPedidoLanche.idLanche"
+                        [filter]="true" [emptyFilterMessage]="'Nenhum lanche corresponde à pesquisa!'"
+                        [autoDisplayFirst]="false" [style]="{width: '100%'}">
+                    </p-dropdown>
+                    <label for="inputtext">Selecione um Lanche</label>
+                </span>
+            </div>
+            <div class="col-12 col-lg-4 mt-4">
+                <span class="p-float-label">
+                    <p-inputNumber [(ngModel)]="formularioPedidoLanche.quantidade" [showButtons]="true" [min]="1"></p-inputNumber>
+                    <label for="inputtext">Quantidade</label>
+                </span>
+            </div>
+        </div>
+
+        <div class="row mb-5">
+            <div class="col-12 mt-5">
+                <span class="p-float-label">
+                    <textarea pInputTextarea [(ngModel)]="formularioPedidoLanche.observacoes"
+                        [rows]="2" autoResize="autoResize" [style]="{width: '100%'}">
+                    </textarea>
+                    <label for="inputtext">Observações</label>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <p-footer>
+        <button class="btn btn-danger" (click)="fecharDialogAdicaoLancheNoPedido()"
+            [disabled]="processandoAdicaoLanchePedido">
+            <i class="fas fa-arrow-circle-left"></i>
+            Voltar
+        </button>
+
+        <button class="btn btn-success" [disabled]="desabilitarBotaoAdicaoLancheNoPedido()" 
+            (click)="adicionarLancheAoPedido()">
+            <i class="fas " [ngClass]="processandoAdicaoLanchePedido ? 'fa-spin fa-circle-notch' : 'fa-check-circle'"></i>
+            Confirmar
+        </button>
+    </p-footer>
+</p-dialog>
+
+<!-- Dialog adicionar bebida ao Pedido -->
+<p-dialog [visible]="abrirDialogAdicaoBebidaNoPedido" [modal]="true" [blockScroll]="true" 
+    [draggable]="false" [closable]="false" [style]="{width: '70vw'}">
+
+    <p-header>Adicionar Bebida ao Pedido <b>{{ pedidoSelecionado.id }}</b></p-header>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12 col-lg-8 mt-4">
+                <span class="p-float-label">
+                    <p-dropdown [options]="bebidasDropdown" [(ngModel)]="formularioPedidoBebida.idProduto"
+                        [filter]="true" [emptyFilterMessage]="'Nenhuma Bebida corresponde à pesquisa!'"
+                        [autoDisplayFirst]="false" [style]="{width: '100%'}">
+                    </p-dropdown>
+                    <label for="inputtext">Selecione uma Bebida</label>
+                </span>
+            </div>
+            <div class="col-12 col-lg-4 mt-4">
+                <span class="p-float-label">
+                    <p-inputNumber [(ngModel)]="formularioPedidoBebida.quantidade" [showButtons]="true" [min]="1"></p-inputNumber>
+                    <label for="inputtext">Quantidade</label>
+                </span>
+            </div>
+        </div>
+
+        <div class="row mb-5">
+            <div class="col-12 mt-5">
+                <span class="p-float-label">
+                    <textarea pInputTextarea [(ngModel)]="formularioPedidoBebida.observacoes"
+                        [rows]="2" autoResize="autoResize" [style]="{width: '100%'}">
+                    </textarea>
+                    <label for="inputtext">Observações</label>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <p-footer>
+        <button class="btn btn-danger" (click)="fecharDialogAdicaoBebidaNoPedido()"
+            [disabled]="processandoAdicaoBebidaPedido">
+            <i class="fas fa-arrow-circle-left"></i>
+            Voltar
+        </button>
+
+        <button class="btn btn-success" [disabled]="desabilitarBotaoAdicaoBebidaNoPedido()" 
+            (click)="adicionarBebidaAoPedido()">
+            <i class="fas " [ngClass]="processandoAdicaoBebidaPedido ? 'fa-spin fa-circle-notch' : 'fa-check-circle'"></i>
+            Confirmar
+        </button>
+    </p-footer>
+</p-dialog>
+
+<!-- Dialog exclusão de Pedido -->
+<p-dialog [visible]="abrirDialogExclusaoPedido" [modal]="true" [blockScroll]="true" 
+    [draggable]="false" [closable]="false" [style]="{width: '30vw'}">
+
+    <p-header>Excluir Pedido</p-header>
+
+    <div class="container-fluid">
+        Tem certeza que deseja excluir o Pedido com ID <b>{{ pedidoSelecionado.id }}</b> 
+        <span *ngIf="pedidoSelecionado.cliente"> de <b>{{ pedidoSelecionado.cliente.nome }}</b></span>?      
+    </div>
+
+    <p-footer>
+        <button class="btn btn-danger" (click)="fecharDialogExclusaoPedido()">
+            <i class="fas fa-arrow-circle-left"></i>
+            Voltar
+        </button>
+
+        <button class="btn btn-success" [disabled]="processandoExclusaoPedido" 
+            (click)="excluirPedido()">
+            <i class="fas " [ngClass]="processandoExclusaoPedido ? 'fa-spin fa-circle-notch' : 'fa-check-circle'"></i>
             Confirmar
         </button>
     </p-footer>

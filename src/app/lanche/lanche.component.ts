@@ -93,24 +93,6 @@ export class LancheComponent implements OnInit {
       || this.formularioLanche.imagemBase64 !== this.lancheSelecionado.imagemBase64;
   }
 
-  public eventoPerdaFocoBolsaMensal(): void {
-    if (this.formularioLanche.preco && this.formularioLanche.preco !== '') {
-      const valorBolsa: string[] = this.formularioLanche.preco.split(',');
-      
-      if (valorBolsa.length === 1) {
-        this.formularioLanche.preco += ',00';
-      }
-      else if (valorBolsa.length === 2) {
-        if (valorBolsa[1] === '') {
-          this.formularioLanche.preco += '00';
-        }
-        else if (valorBolsa.length === 2 && valorBolsa[1].length === 1) {
-          this.formularioLanche.preco += '0';
-        }
-      }
-    }
-  }
-
   public cadastrarEditarLanche(): void {
     if (this.abrirDialogCadastro) {
       this.cadastrarLanche();
@@ -126,7 +108,7 @@ export class LancheComponent implements OnInit {
 
     this.lancheService.encodeImagemLancheParaBase64(imagem)
       .subscribe((imagem: ImagemLancheBase64) => {
-        this.formularioLanche.imagemBase64 = imagem.imagemBase64;
+        this.formularioLanche.imagemBase64 = `data:image/png;base64,${imagem.imagemBase64}`;
         this.processandoUploadImagemLanche = false;
       },
       () => {
@@ -138,6 +120,7 @@ export class LancheComponent implements OnInit {
 
   private cadastrarLanche(): void {
     this.processandoCadastroEdicaoLanche = true;
+    this.formularioLanche.preco = this.formularioLanche.preco.toString().replace(',', '.');
 
     this.lancheService.cadastrarLanche(this.formularioLanche)
       .subscribe(() => {
@@ -160,6 +143,7 @@ export class LancheComponent implements OnInit {
 
   private alterarDadosLanche(): void {
     this.processandoCadastroEdicaoLanche = true;
+    this.formularioLanche.preco = this.formularioLanche.preco.toString().replace(',', '.');
 
     this.lancheService.alterarDadosLanche(this.lancheSelecionado.id, this.formularioLanche)
       .subscribe(() => {

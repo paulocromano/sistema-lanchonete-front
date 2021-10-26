@@ -10,6 +10,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { DialogModule } from 'primeng/dialog';
 import { TooltipModule } from 'primeng/tooltip';
 import { InputTextareaModule } from 'primeng/inputtextarea';
+import { InputNumberModule } from 'primeng/inputnumber';
 
 import { LancheComponent } from './lanche.component';
 
@@ -26,6 +27,7 @@ const maskConfig: Partial<IConfig> = { validation: false }
     DialogModule,
     TooltipModule,
     InputTextareaModule,
+    InputNumberModule,
     NgxMaskModule.forRoot(maskConfig)
   ]
 })
