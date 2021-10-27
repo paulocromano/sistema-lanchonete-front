@@ -13,9 +13,15 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 
 import { PedidoComponent } from './pedido.component';
+import { PedidoLancheComponent } from './pedido-lanche/pedido-lanche.component';
+import { PedidoBebidaComponent } from './pedido-bebida/pedido-bebida.component';
 
 @NgModule({
-  declarations: [ PedidoComponent ],
+  declarations: [ 
+    PedidoComponent, 
+    PedidoLancheComponent, 
+    PedidoBebidaComponent 
+  ],
   imports: [
     CommonModule,
     FormsModule,

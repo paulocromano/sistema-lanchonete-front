@@ -1,0 +1,82 @@
+<h3 class="text-center">Pedido de Bebidas</h3>
+
+<div class="borda-table mt-2">
+    <p-table #dataView [value]="pedidoSelecionado.bebidas" [columns]="colunasTabela" [responsive]="true" [rows]="8" 
+        [paginator]="true" class="text-center">
+
+        <ng-template pTemplate="caption">
+            <div class="row">
+                <div class="col-12 col-sm-6 col-md-6 col-lg-4">
+                    <input type="text" pInputText placeholder="Pesquisa" class="pesquisa" [(ngModel)]="inputPesquisa"
+                        (input)="dataView.filterGlobal($event.target.value, 'contains')">
+                    <i class="fas fa-search" style="font-size: 1.18em;"></i>
+                </div>
+            </div>
+        </ng-template>
+
+        <ng-template pTemplate="header" let-colunas>
+            <tr>
+                <th *ngFor="let coluna of colunas" [pSortableColumn]="coluna.ordenavel ? coluna.field : ''" 
+                    [ngClass]="coluna.style" class="text-center">
+
+                    {{ coluna.header }}
+                    <p-sortIcon *ngIf="coluna.ordenavel" [field]="coluna.field"></p-sortIcon>
+                </th>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-bebida>
+            <tr>
+                <td *ngFor="let coluna of colunasTabela" class="text-center">
+                    <span class="ui-column-title text-left">{{ bebida[coluna.field] }}</span>
+
+                    <span *ngIf="coluna.header === 'Ações'">
+                        <button class="btn btn-danger" pTooltip="Excluir" tooltipPosition="bottom"
+                            (click)="armazenarBebidaParaExclusao(bebida)">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </span>
+                </td>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage" class="text-center" let-bebidas>
+            <tr>
+                <td [attr.colspan]="bebidas.length" class="text-center">
+                    <span>
+                        {{ inputPesquisa ? 'Nenhuma Bebida corresponde à pesquisa!' : 'Nenhuma Bebida encontrado!' }}
+                    </span>
+                </td>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="summary">
+            Bebidas encontrados: {{ pedidoSelecionado.bebidas ? pedidoSelecionado.bebidas.length : 0 }}
+        </ng-template>
+    </p-table>
+</div>
+
+<!-- Dialog exclusão de Pedido -->
+<p-dialog [visible]="abrirDialogExclusaoBebida" [modal]="true" [blockScroll]="true" 
+    [draggable]="false" [closable]="false" [style]="{width: '30vw'}">
+
+    <p-header>Excluir Bebida do Pedido</p-header>
+
+    <div class="container-fluid">
+        Tem certeza que deseja excluir a bebida <b>{{ bebidaSelecionada.descricao }}</b>
+            do seu pedido?
+    </div>
+
+    <p-footer>
+        <button class="btn btn-danger" (click)="fecharDialogExclusaoBebida()">
+            <i class="fas fa-arrow-circle-left"></i>
+            Voltar
+        </button>
+
+        <button class="btn btn-success" [disabled]="processandoExclusaoBebida" 
+            (click)="excluirBebida()">
+            <i class="fas " [ngClass]="processandoExclusaoBebida ? 'fa-spin fa-circle-notch' : 'fa-check-circle'"></i>
+            Confirmar
+        </button>
+    </p-footer>
+</p-dialog>

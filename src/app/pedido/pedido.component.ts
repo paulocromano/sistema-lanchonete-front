@@ -229,4 +229,10 @@ export class PedidoComponent implements OnInit {
         this.toastrService.error('Erro ao excluir o Pedido!');
       });
   }
+
+  public eventoExclusaoBebidaDoPedido(bebidaExcluida: boolean): void {
+    if (bebidaExcluida) {
+      this.buscarPedidos();
+    }
+  }
 }
