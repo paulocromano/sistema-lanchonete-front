@@ -2,9 +2,9 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 import { ToastrService } from 'ngx-toastr';
 
-import { Produto } from 'src/app/produto/shared/model/produto.model';
 import { Pedido } from '../shared/model/pedido.model';
-import { PedidoService } from '../shared/service/pedido.service';
+import { PedidoBebida } from './shared/model/pedido-bebida.model';
+import { PedidoBebidaService } from './shared/service/pedido-bebida.service';
 
 @Component({
   selector: 'app-pedido-bebida',
@@ -17,7 +17,7 @@ export class PedidoBebidaComponent implements OnInit {
   @Input() public exibirBotaoExcluirBebida: boolean = false;
   @Output() public eventoBebidaExcluida: EventEmitter<boolean> = new EventEmitter();
 
-  public bebidaSelecionada: Produto = new Produto();
+  public bebidaSelecionada: PedidoBebida = new PedidoBebida();
 
   public colunasTabela: any;
   public inputPesquisa: string;
@@ -27,7 +27,7 @@ export class PedidoBebidaComponent implements OnInit {
 
   constructor(
     private toastrService: ToastrService,
-    private pedidoService: PedidoService
+    private pedidoBebidaService: PedidoBebidaService
   ) { }
 
   ngOnInit(): void {
@@ -37,26 +37,27 @@ export class PedidoBebidaComponent implements OnInit {
   private definirColunasTabela(): void {
     this.colunasTabela = [
       { header: 'ID', field: 'id', ordenavel: true, style: 'col-id' },
-      { header: 'Descrição', field: 'descricao', ordenavel: true, style: 'col-descricao' },
-      { header: 'Preço R$', field: 'preco', ordenavel: false, style: 'col-preco' },
+      { header: 'Descrição', field: 'bebida', ordenavel: true, style: 'col-bebida' },
+      { header: 'Preço Unitário R$', field: 'precoUnitario', ordenavel: false, style: 'col-preco-unitario' },
+      { header: 'Quantidade', field: 'quantidade', ordenavel: true, style: 'col-quantidade' },
       { header: 'Ações', style: 'col-acoes' }
     ];
   }
 
-  public armazenarBebidaParaExclusao(bebida: Produto): void {
+  public armazenarBebidaParaExclusao(bebida: PedidoBebida): void {
     this.bebidaSelecionada = bebida;
     this.abrirDialogExclusaoBebida = true;
   }
 
   public fecharDialogExclusaoBebida(): void {
     this.abrirDialogExclusaoBebida = false;
-    this.bebidaSelecionada = new Produto();
+    this.bebidaSelecionada = new PedidoBebida();
   }
 
   public excluirBebida(): void {
     this.processandoExclusaoBebida = true;
 
-    this.pedidoService.excluirBebidaDoPedido(this.pedidoSelecionado.id, this.bebidaSelecionada.id)
+    this.pedidoBebidaService.excluirBebidaDoPedido(this.pedidoSelecionado.id, this.bebidaSelecionada.id)
       .subscribe(() => {
         this.processandoExclusaoBebida = false;
         this.toastrService.success('Bebida excluída com sucesso do Pedido!');

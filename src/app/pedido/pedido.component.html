@@ -44,12 +44,12 @@
                                 (click)="armazenarPedidoParaVisualizarInformacoes(pedido)">
                                 <i class="fas fa-info text-light"></i>
                             </button>
-                            <button class="btn btn-warning mr-2" pTooltip="Adicionar Lanche" tooltipPosition="bottom"
-                                (click)="armazenarPedidoParaAdicionarLanche(pedido)">
+                            <button class="btn btn-warning mr-2" pTooltip="Lanches" tooltipPosition="bottom"
+                                (click)="armazenarPedidoParaDialogLanches(pedido)">
                                 <i class="fas fa-hamburger"></i>
                             </button>
-                            <button class="btn btn-secondary mr-2" pTooltip="Adicionar Bebida" tooltipPosition="bottom"
-                                (click)="armazenarPedidoParaAdicionarBebida(pedido)">
+                            <button class="btn btn-secondary mr-2" pTooltip="Bebidas" tooltipPosition="bottom"
+                                (click)="armazenarPedidoParaDialogBebidas(pedido)">
                                 <i class="fas fa-wine-bottle"></i>
                             </button>
                             <button class="btn btn-danger" pTooltip="Excluir" tooltipPosition="bottom"
@@ -92,7 +92,9 @@
         <div class="row">
             <div class="col-12">
                 <span class="mr-3"><b>Para entrega?</b></span>
-                <p-radioButton class="ml-2" value="S" label="Sim" [(ngModel)]="formularioPedido.entrega"></p-radioButton>
+                <p-radioButton class="ml-2" value="S" label="Sim" (onClick)="resetarEscolhaMesa()" 
+                    [(ngModel)]="formularioPedido.entrega">
+                </p-radioButton>
                 <p-radioButton class="ml-2" value="N" label="Não" [(ngModel)]="formularioPedido.entrega"></p-radioButton>
             </div>
         </div>
@@ -151,11 +153,11 @@
     </p-footer>
 </p-dialog>
 
-<!-- Dialog adicionar lanche ao Pedido -->
-<p-dialog [visible]="abrirDialogAdicaoLancheNoPedido" [modal]="true" [blockScroll]="true" 
+<!-- Dialog lanches ao Pedido -->
+<p-dialog [visible]="abrirDialogLanchesDoPedido" [modal]="true" [blockScroll]="true" 
     [draggable]="false" [closable]="false" [style]="{width: '70vw'}">
 
-    <p-header>Adicionar Lanche ao Pedido <b>{{ pedidoSelecionado.id }}</b></p-header>
+    <p-header>Lanches do Pedido <b>{{ pedidoSelecionado.id }}</b></p-header>
 
     <div class="container-fluid">
         <div class="row">
@@ -189,13 +191,16 @@
 
         <div class="row mt-4">
             <div class="col-12">
-                <app-pedido-lanche></app-pedido-lanche>
+                <app-pedido-lanche [pedidoSelecionado]="pedidoSelecionado"
+                    [exibirBotaoExcluirLanche]="true"
+                    (eventoLancheExcluido)="eventoExclusaoLancheDoPedido($event)">
+                </app-pedido-lanche>
             </div>
         </div>
     </div>
 
     <p-footer>
-        <button class="btn btn-danger" (click)="fecharDialogAdicaoLancheNoPedido()"
+        <button class="btn btn-danger" (click)="fecharDialogLanchesDoPedido()"
             [disabled]="processandoAdicaoLanchePedido">
             <i class="fas fa-arrow-circle-left"></i>
             Voltar
@@ -209,11 +214,11 @@
     </p-footer>
 </p-dialog>
 
-<!-- Dialog adicionar bebida ao Pedido -->
-<p-dialog [visible]="abrirDialogAdicaoBebidaNoPedido" [modal]="true" [blockScroll]="true" 
+<!-- Dialog bebidas ao Pedido -->
+<p-dialog [visible]="abrirDialogBebidasDoPedido" [modal]="true" [blockScroll]="true" 
     [draggable]="false" [closable]="false" [style]="{width: '70vw'}">
 
-    <p-header>Adicionar Bebida ao Pedido <b>{{ pedidoSelecionado.id }}</b></p-header>
+    <p-header>Bebidas do Pedido <b>{{ pedidoSelecionado.id }}</b></p-header>
 
     <div class="container-fluid">
         <div class="row">
@@ -256,7 +261,7 @@
     </div>
 
     <p-footer>
-        <button class="btn btn-danger" (click)="fecharDialogAdicaoBebidaNoPedido()"
+        <button class="btn btn-danger" (click)="fecharDialogBebidasDoPedido()"
             [disabled]="processandoAdicaoBebidaPedido">
             <i class="fas fa-arrow-circle-left"></i>
             Voltar

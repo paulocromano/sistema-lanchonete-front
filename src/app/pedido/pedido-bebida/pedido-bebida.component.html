@@ -28,7 +28,10 @@
         <ng-template pTemplate="body" let-bebida>
             <tr>
                 <td *ngFor="let coluna of colunasTabela" class="text-center">
-                    <span class="ui-column-title text-left">{{ bebida[coluna.field] }}</span>
+                    <span *ngIf="coluna.header !== 'Descrição'" class="ui-column-title text-left">{{ bebida[coluna.field] }}</span>
+                    <span *ngIf="coluna.header === 'Descrição'" class="ui-column-title text-left">
+                        {{ bebida[coluna.field].descricao }}
+                    </span>
 
                     <span *ngIf="coluna.header === 'Ações'">
                         <button class="btn btn-danger" pTooltip="Excluir" tooltipPosition="bottom"
@@ -40,18 +43,18 @@
             </tr>
         </ng-template>
 
-        <ng-template pTemplate="emptymessage" class="text-center" let-bebidas>
+        <ng-template pTemplate="emptymessage" class="text-center" let-colunasTabela>
             <tr>
-                <td [attr.colspan]="bebidas.length" class="text-center">
+                <td [attr.colspan]="colunasTabela.length" class="text-center">
                     <span>
-                        {{ inputPesquisa ? 'Nenhuma Bebida corresponde à pesquisa!' : 'Nenhuma Bebida encontrado!' }}
+                        {{ inputPesquisa ? 'Nenhuma Bebida corresponde à pesquisa!' : 'Nenhuma Bebida encontrada!' }}
                     </span>
                 </td>
             </tr>
         </ng-template>
 
         <ng-template pTemplate="summary">
-            Bebidas encontrados: {{ pedidoSelecionado.bebidas ? pedidoSelecionado.bebidas.length : 0 }}
+            Bebidas encontradas: {{ pedidoSelecionado.bebidas ? pedidoSelecionado.bebidas.length : 0 }}
         </ng-template>
     </p-table>
 </div>
@@ -63,7 +66,7 @@
     <p-header>Excluir Bebida do Pedido</p-header>
 
     <div class="container-fluid">
-        Tem certeza que deseja excluir a bebida <b>{{ bebidaSelecionada.descricao }}</b>
+        Tem certeza que deseja excluir a bebida <b>{{ bebidaSelecionada.bebida.descricao }}</b>
             do seu pedido?
     </div>
 

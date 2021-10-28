@@ -1,1 +1,85 @@
-<p>pedido-lanche works!</p>
+<h3 class="text-center">Pedido de Bebidas</h3>
+
+<div class="borda-table mt-2">
+    <p-table #dataView [value]="pedidoSelecionado.lanches" [columns]="colunasTabela" [responsive]="true" [rows]="8" 
+        [paginator]="true" class="text-center">
+
+        <ng-template pTemplate="caption">
+            <div class="row">
+                <div class="col-12 col-sm-6 col-md-6 col-lg-4">
+                    <input type="text" pInputText placeholder="Pesquisa" class="pesquisa" [(ngModel)]="inputPesquisa"
+                        (input)="dataView.filterGlobal($event.target.value, 'contains')">
+                    <i class="fas fa-search" style="font-size: 1.18em;"></i>
+                </div>
+            </div>
+        </ng-template>
+
+        <ng-template pTemplate="header" let-colunas>
+            <tr>
+                <th *ngFor="let coluna of colunas" [pSortableColumn]="coluna.ordenavel ? coluna.field : ''" 
+                    [ngClass]="coluna.style" class="text-center">
+
+                    {{ coluna.header }}
+                    <p-sortIcon *ngIf="coluna.ordenavel" [field]="coluna.field"></p-sortIcon>
+                </th>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-lanche>
+            <tr>
+                <td *ngFor="let coluna of colunasTabela" class="text-center">
+                    <span *ngIf="coluna.header !== 'Nome'" class="ui-column-title text-left">{{ lanche[coluna.field] }}</span>
+                    <span *ngIf="coluna.header === 'Nome'" class="ui-column-title text-left">
+                        {{ lanche[coluna.field].nome }}
+                    </span>
+
+                    <span *ngIf="coluna.header === 'Ações'">
+                        <button class="btn btn-danger" pTooltip="Excluir" tooltipPosition="bottom"
+                            (click)="armazenarLancheParaExclusao(lanche)">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </span>
+                </td>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage" class="text-center" let-colunasTabela>
+            <tr>
+                <td [attr.colspan]="colunasTabela.length" class="text-center">
+                    <span>
+                        {{ inputPesquisa ? 'Nenhum Lanche corresponde à pesquisa!' : 'Nenhum Lanche encontrado!' }}
+                    </span>
+                </td>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="summary">
+            Lanches encontrados: {{ pedidoSelecionado.lanches ? pedidoSelecionado.lanches.length : 0 }}
+        </ng-template>
+    </p-table>
+</div>
+
+<!-- Dialog exclusão de Pedido -->
+<p-dialog [visible]="abrirDialogExclusaoLanche" [modal]="true" [blockScroll]="true" 
+    [draggable]="false" [closable]="false" [style]="{width: '30vw'}">
+
+    <p-header>Excluir Lanche do Pedido</p-header>
+
+    <div class="container-fluid">
+        Tem certeza que deseja excluir o lanche <b>{{ lancheSelecionado.lanche.nome }}</b>
+            do seu pedido?
+    </div>
+
+    <p-footer>
+        <button class="btn btn-danger" (click)="fecharDialogExclusaoLanche()">
+            <i class="fas fa-arrow-circle-left"></i>
+            Voltar
+        </button>
+
+        <button class="btn btn-success" [disabled]="processandoExclusaoLanche" 
+            (click)="excluirLanche()">
+            <i class="fas " [ngClass]="processandoExclusaoLanche ? 'fa-spin fa-circle-notch' : 'fa-check-circle'"></i>
+            Confirmar
+        </button>
+    </p-footer>
+</p-dialog>

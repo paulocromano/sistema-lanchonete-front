@@ -1,7 +1,7 @@
 import { Mesa } from '../../../mesa/shared/model/mesa.model';
 import { Cliente } from '../../../cliente/shared/model/cliente.model';
-import { Lanche } from '../../../lanche/shared/model/lanche.model';
-import { Produto } from '../../../produto/shared/model/produto.model';
+import { PedidoLanche } from '../../pedido-lanche/shared/model/pedido-lanche.model';
+import { PedidoBebida } from '../../pedido-bebida/shared/model/pedido-bebida.model';
 
 export class Pedido {
 
@@ -13,6 +13,6 @@ export class Pedido {
     precoTotal: string;
     mesa: Mesa = new Mesa();
     cliente: Cliente = new Cliente();
-    lanches: Lanche[] = [];
-    bebidas: Produto[] = [];
+    lanches: PedidoLanche[] = [];
+    bebidas: PedidoBebida[] = [];
 }

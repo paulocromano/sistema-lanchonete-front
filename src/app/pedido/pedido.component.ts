@@ -3,12 +3,14 @@ import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { SelectItem } from 'primeng/api';
 import { InformacaoParaPedido } from './shared/model/informacao-para-pedido.model';
-import { PedidoBebidaFORM } from './shared/model/pedido-bebida.form';
-import { PedidoLancheFORM } from './shared/model/pedido-lanche.form';
+import { PedidoBebidaFORM } from './pedido-bebida/shared/model/pedido-bebida.form';
+import { PedidoLancheFORM } from './pedido-lanche/shared/model/pedido-lanche.form';
 import { PedidoFORM } from './shared/model/pedido.form';
 import { Pedido } from './shared/model/pedido.model';
 
 import { PedidoService } from './shared/service/pedido.service';
+import { PedidoBebidaService } from './pedido-bebida/shared/service/pedido-bebida.service';
+import { PedidoLancheService } from './pedido-lanche/shared/service/pedido-lanche.service';
 
 @Component({
   selector: 'app-pedido',
@@ -33,8 +35,8 @@ export class PedidoComponent implements OnInit {
 
   public abrirDialogCadastro: boolean = false; 
   public abrirDialogInformacoesPedido: boolean = false;
-  public abrirDialogAdicaoLancheNoPedido: boolean = false;
-  public abrirDialogAdicaoBebidaNoPedido: boolean = false;
+  public abrirDialogLanchesDoPedido: boolean = false;
+  public abrirDialogBebidasDoPedido: boolean = false;
   public abrirDialogExclusaoPedido: boolean = false;
 
   public processandoOperacaoListagem: boolean = false;
@@ -46,7 +48,9 @@ export class PedidoComponent implements OnInit {
 
   constructor(
     private toastrService: ToastrService,
-    private pedidoService: PedidoService
+    private pedidoService: PedidoService,
+    private pedidoBebidaService: PedidoBebidaService,
+    private pedidoLancheService: PedidoLancheService
   ) { }
 
   ngOnInit(): void {
@@ -107,9 +111,15 @@ export class PedidoComponent implements OnInit {
     this.formularioPedido = new PedidoFORM();
   }
 
+  public resetarEscolhaMesa(): void {
+    this.formularioPedido.idMesa = null;
+  }
+
   public desabilitarBotaoCadastroPedido(): boolean {
-    return this.processandoCadastroPedido || !(this.formularioPedido
-      && this.formularioPedido.entrega);
+    if (this.formularioPedido && this.formularioPedido.entrega) {
+      return (this.formularioPedido.entrega === 'S') ? true : !this.formularioPedido.idMesa;
+    }
+    return true;
   }
 
   public cadastrarPedido(): void {
@@ -138,14 +148,14 @@ export class PedidoComponent implements OnInit {
     this.pedidoSelecionado = new Pedido();
   }
 
-  public armazenarPedidoParaAdicionarLanche(pedido: Pedido): void {
+  public armazenarPedidoParaDialogLanches(pedido: Pedido): void {
     this.pedidoSelecionado = pedido;
     this.formularioPedidoLanche.observacoes = pedido.observacoes;
-    this.abrirDialogAdicaoLancheNoPedido = true;
+    this.abrirDialogLanchesDoPedido = true;
   }
 
-  public fecharDialogAdicaoLancheNoPedido(): void {
-    this.abrirDialogAdicaoLancheNoPedido = false;
+  public fecharDialogLanchesDoPedido(): void {
+    this.abrirDialogLanchesDoPedido = false;
     this.pedidoSelecionado = new Pedido();
     this.formularioPedidoLanche = new PedidoLancheFORM();
   }
@@ -158,11 +168,11 @@ export class PedidoComponent implements OnInit {
   public adicionarLancheAoPedido(): void {
     this.processandoAdicaoLanchePedido = true;
 
-    this.pedidoService.adicionarLancheAoPedido(this.pedidoSelecionado.id, this.formularioPedidoLanche)
+    this.pedidoLancheService.adicionarLancheAoPedido(this.pedidoSelecionado.id, this.formularioPedidoLanche)
       .subscribe(() => {
         this.processandoAdicaoLanchePedido = false;
         this.toastrService.success('Lanche adicionado com sucesso no Pedido!');
-        this.fecharDialogAdicaoLancheNoPedido();
+        this.fecharDialogLanchesDoPedido();
         this.buscarPedidos();
       },
       () => {
@@ -171,14 +181,14 @@ export class PedidoComponent implements OnInit {
       });
   }
 
-  public armazenarPedidoParaAdicionarBebida(pedido: Pedido): void {
+  public armazenarPedidoParaDialogBebidas(pedido: Pedido): void {
     this.pedidoSelecionado = pedido;
     this.formularioPedidoBebida.observacoes = pedido.observacoes;
-    this.abrirDialogAdicaoBebidaNoPedido = true;
+    this.abrirDialogBebidasDoPedido = true;
   }
 
-  public fecharDialogAdicaoBebidaNoPedido(): void {
-    this.abrirDialogAdicaoBebidaNoPedido = false;
+  public fecharDialogBebidasDoPedido(): void {
+    this.abrirDialogBebidasDoPedido = false;
     this.pedidoSelecionado = new Pedido();
     this.formularioPedidoBebida = new PedidoBebidaFORM();
   }
@@ -191,11 +201,11 @@ export class PedidoComponent implements OnInit {
   public adicionarBebidaAoPedido(): void {
     this.processandoAdicaoBebidaPedido = true;
 
-    this.pedidoService.adicionarBebidaAoPedido(this.pedidoSelecionado.id, this.formularioPedidoBebida)
+    this.pedidoBebidaService.adicionarBebidaAoPedido(this.pedidoSelecionado.id, this.formularioPedidoBebida)
       .subscribe(() => {
         this.processandoAdicaoBebidaPedido = false;
         this.toastrService.success('Bebida adicionada com sucesso no Pedido!');
-        this.fecharDialogAdicaoBebidaNoPedido();
+        this.fecharDialogBebidasDoPedido();
         this.buscarPedidos();
       },
       () => {
@@ -232,6 +242,14 @@ export class PedidoComponent implements OnInit {
 
   public eventoExclusaoBebidaDoPedido(bebidaExcluida: boolean): void {
     if (bebidaExcluida) {
+      this.fecharDialogBebidasDoPedido();
+      this.buscarPedidos();
+    }
+  }
+
+  public eventoExclusaoLancheDoPedido(lancheExcluido: boolean): void {
+    if (lancheExcluido) {
+      this.fecharDialogLanchesDoPedido();
       this.buscarPedidos();
     }
   }
