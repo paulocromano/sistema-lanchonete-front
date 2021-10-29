@@ -7,3 +7,7 @@
     margin-right: 8px;
     width: calc(100% - 28px);
 }
+
+.col-acoes {
+    width: 18vw;
+}

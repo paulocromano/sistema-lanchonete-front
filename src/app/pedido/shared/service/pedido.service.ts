@@ -37,4 +37,8 @@ export class PedidoService {
   public excluirPedido(idPedido: number): Observable<any> {
     return this.http.delete(`${this.baseUrl}/excluir/${idPedido}`);
   }
+
+  public finalizarPedido(idPedido: number): Observable<any> {
+    return this.http.put(`${this.baseUrl}/finalizar-pedido/${idPedido}`, null);
+  }
 }

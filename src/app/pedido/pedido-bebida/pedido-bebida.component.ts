@@ -19,7 +19,7 @@ export class PedidoBebidaComponent implements OnInit {
 
   public bebidaSelecionada: PedidoBebida = new PedidoBebida();
 
-  public colunasTabela: any;
+  public colunasTabela: any[] = [];
   public inputPesquisa: string;
 
   public abrirDialogExclusaoBebida: boolean = false;
@@ -39,9 +39,12 @@ export class PedidoBebidaComponent implements OnInit {
       { header: 'ID', field: 'id', ordenavel: true, style: 'col-id' },
       { header: 'Descrição', field: 'bebida', ordenavel: true, style: 'col-bebida' },
       { header: 'Preço Unitário R$', field: 'precoUnitario', ordenavel: false, style: 'col-preco-unitario' },
-      { header: 'Quantidade', field: 'quantidade', ordenavel: true, style: 'col-quantidade' },
-      { header: 'Ações', style: 'col-acoes' }
+      { header: 'Quantidade', field: 'quantidade', ordenavel: true, style: 'col-quantidade' }  
     ];
+
+    if (this.exibirBotaoExcluirBebida) {
+      this.colunasTabela.push({ header: 'Ações', style: 'col-acoes' });
+    }
   }
 
   public armazenarBebidaParaExclusao(bebida: PedidoBebida): void {

@@ -44,13 +44,20 @@
                                 (click)="armazenarPedidoParaVisualizarInformacoes(pedido)">
                                 <i class="fas fa-info text-light"></i>
                             </button>
-                            <button class="btn btn-warning mr-2" pTooltip="Lanches" tooltipPosition="bottom"
+                            <button *ngIf="pedido.pedidoFinalizado === 'Não'" class="btn btn-warning mr-2" 
+                                pTooltip="Lanches" tooltipPosition="bottom"
                                 (click)="armazenarPedidoParaDialogLanches(pedido)">
                                 <i class="fas fa-hamburger"></i>
                             </button>
-                            <button class="btn btn-secondary mr-2" pTooltip="Bebidas" tooltipPosition="bottom"
+                            <button *ngIf="pedido.pedidoFinalizado === 'Não'" class="btn btn-secondary mr-2" 
+                                pTooltip="Bebidas" tooltipPosition="bottom"
                                 (click)="armazenarPedidoParaDialogBebidas(pedido)">
                                 <i class="fas fa-wine-bottle"></i>
+                            </button>
+                            <button *ngIf="pedido.pedidoFinalizado === 'Não'" class="btn btn-light mr-2" 
+                                pTooltip="Finalizar Pedido" tooltipPosition="bottom"
+                                (click)="armazenarPedidoParaFinalizacao(pedido)">
+                                <i class="fas fa-check"></i>
                             </button>
                             <button class="btn btn-danger" pTooltip="Excluir" tooltipPosition="bottom"
                                 (click)="armazenarPedidoParaExclusao(pedido)">
@@ -92,9 +99,7 @@
         <div class="row">
             <div class="col-12">
                 <span class="mr-3"><b>Para entrega?</b></span>
-                <p-radioButton class="ml-2" value="S" label="Sim" (onClick)="resetarEscolhaMesa()" 
-                    [(ngModel)]="formularioPedido.entrega">
-                </p-radioButton>
+                <p-radioButton class="ml-2" value="S" label="Sim" [(ngModel)]="formularioPedido.entrega"></p-radioButton>
                 <p-radioButton class="ml-2" value="N" label="Não" [(ngModel)]="formularioPedido.entrega"></p-radioButton>
             </div>
         </div>
@@ -142,7 +147,44 @@
     <p-header>Informações do Pedido</p-header>
 
     <div class="container-fluid">
+        <div *ngIf="pedidoSelecionado.cliente">
+            <h3 class="mt-3">Cliente</h3>
 
+            <div><b>Nome: </b>{{ pedidoSelecionado.cliente.nome }}</div>
+            <div><b>Telefone: </b>{{ pedidoSelecionado.cliente.telefone }}</div>
+            <div><b>Telefone para Recado: </b>{{ pedidoSelecionado.cliente.telefoneRecado }}</div>
+            <div><b>Cadastro Realizado em: </b>
+                {{ formatarData(pedidoSelecionado.cliente.dataCadastro) }}
+            </div>
+            <hr>
+        </div>
+
+        <div *ngIf="pedidoSelecionado.mesa" class="mt-3">
+            <h3>Mesa</h3>
+
+            <div><b>Número: </b>{{ pedidoSelecionado.mesa.numero }}</div>
+            <div><b>Mesa Ativa: </b>{{ pedidoSelecionado.mesa.mesaAtiva }}</div>
+            <hr>
+        </div>
+
+        <div class="mt-3">
+            <h3>Pedido</h3>
+
+            <div><b>ID: </b>{{ pedidoSelecionado.id }}</div>
+            <div><b>Entrega: </b>{{ pedidoSelecionado.entrega }}</div>
+            <div><b>Data e Horário do Pedido: </b>{{ pedidoSelecionado.dataHoraPedido }}</div>
+            <div *ngIf="pedidoSelecionado.dataHoraEntrega"><b>Data e Horário da Entrega: </b>{{ pedidoSelecionado.dataHoraEntrega }}</div>
+            <div><b>Preço Total R$: </b>{{ pedidoSelecionado.precoTotal }}</div>
+            <div><b>Pedido finalizado: </b>{{ pedidoSelecionado.pedidoFinalizado }}</div>
+            <div><b>Observações: </b>{{ pedidoSelecionado.observacoes }}</div>
+
+            <div class="mt-3">
+                <app-pedido-lanche [pedidoSelecionado]="pedidoSelecionado"></app-pedido-lanche>
+            </div>
+            <div class="mt-4">
+                <app-pedido-bebida [pedidoSelecionado]="pedidoSelecionado"></app-pedido-bebida>
+            </div>
+        </div>
     </div>
 
     <p-footer>
@@ -295,6 +337,31 @@
         <button class="btn btn-success" [disabled]="processandoExclusaoPedido" 
             (click)="excluirPedido()">
             <i class="fas " [ngClass]="processandoExclusaoPedido ? 'fa-spin fa-circle-notch' : 'fa-check-circle'"></i>
+            Confirmar
+        </button>
+    </p-footer>
+</p-dialog>
+
+<!-- Dialog finalização de Pedido -->
+<p-dialog [visible]="abrirDialogFinalizarPedido" [modal]="true" [blockScroll]="true" 
+    [draggable]="false" [closable]="false" [style]="{width: '30vw'}">
+
+    <p-header>Finalizar Pedido</p-header>
+
+    <div class="container-fluid">
+        Tem certeza que deseja finalizar o Pedido com ID <b>{{ pedidoSelecionado.id }}</b> 
+        <span *ngIf="pedidoSelecionado.cliente"> de <b>{{ pedidoSelecionado.cliente.nome }}</b></span>?      
+    </div>
+
+    <p-footer>
+        <button class="btn btn-danger" (click)="fecharDialogFinalizacaoPedido()">
+            <i class="fas fa-arrow-circle-left"></i>
+            Voltar
+        </button>
+
+        <button class="btn btn-success" [disabled]="processandoFinalizacaoPedido" 
+            (click)="finalizarPedido()">
+            <i class="fas " [ngClass]="processandoFinalizacaoPedido ? 'fa-spin fa-circle-notch' : 'fa-check-circle'"></i>
             Confirmar
         </button>
     </p-footer>

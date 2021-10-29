@@ -19,7 +19,7 @@ export class PedidoLancheComponent implements OnInit {
 
   public lancheSelecionado: PedidoLanche = new PedidoLanche();
 
-  public colunasTabela: any;
+  public colunasTabela: any[] = [];
   public inputPesquisa: string;
 
   public abrirDialogExclusaoLanche: boolean = false;
@@ -39,9 +39,12 @@ export class PedidoLancheComponent implements OnInit {
       { header: 'ID', field: 'id', ordenavel: true, style: 'col-id' },
       { header: 'Nome', field: 'lanche', ordenavel: true, style: 'col-lanche' },
       { header: 'Preço Unitário R$', field: 'precoUnitario', ordenavel: false, style: 'col-preco-unitario' },
-      { header: 'Quantidade', field: 'quantidade', ordenavel: true, style: 'col-quantidade' },
-      { header: 'Ações', style: 'col-acoes' }
+      { header: 'Quantidade', field: 'quantidade', ordenavel: true, style: 'col-quantidade' }
     ];
+
+    if (this.exibirBotaoExcluirLanche) {
+      this.colunasTabela.push({ header: 'Ações', style: 'col-acoes' });
+    }
   }
 
   public armazenarLancheParaExclusao(lanche: PedidoLanche): void {

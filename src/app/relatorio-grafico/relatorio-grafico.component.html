@@ -1,1 +1,36 @@
-<p>relatorio-grafico works!</p>
+<h3 class="text-center mt-5">Relatórios</h3>
+
+<div class="container-fluid text-center mt-3">
+    <div class="row">
+        <div class="col-12">
+            <p-dropdown [options]="opcoesRelatorioDropdown" [(ngModel)]="tipoRelatorioSelecionado"
+                (ngModelChange)="eventoRelatorioSelecionado($event)"
+                [filter]="true" [emptyFilterMessage]="'Nenhum relatório corresponde à pesquisa!'"
+                [autoDisplayFirst]="false" placeholder="Selecione um Tipo de Relatório" 
+                [style]="{width: '40vw'}">
+            </p-dropdown>
+        
+            <button class="btn btn-success ml-3" [disabled]="desabilitarBotaoParaGerarRelatorio()"
+                (click)="gerarRelatorio()">
+                <i class="fas " [ngClass]="processandoRelatorio ? 'fa-spin fa-circle-notch' : 'fa-print'"></i>
+                Gerar Relatório
+            </button>
+        </div>
+    </div>
+
+    <div *ngIf="relatorioPorPeriodo" class="row mt-5">
+        <div class="col-6 text-right">
+            <h4 style="margin-right: 140px;">Data Inicial</h4>
+            <p-calendar dataType="string" [locale]="formatoCalendario" dateFormat="dd/mm/yy" 
+                [(ngModel)]="dataInicial" [inline]="true">
+            </p-calendar>
+        </div>
+
+        <div class="col-6 text-left">
+            <h4 style="margin-left: 140px;">Data Final</h4>
+            <p-calendar dataType="string" [locale]="formatoCalendario" dateFormat="dd/mm/yy"
+                [(ngModel)]="dataFinal" [inline]="true">
+            </p-calendar>
+        </div>
+    </div>
+</div>

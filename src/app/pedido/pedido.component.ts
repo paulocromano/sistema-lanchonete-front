@@ -38,6 +38,7 @@ export class PedidoComponent implements OnInit {
   public abrirDialogLanchesDoPedido: boolean = false;
   public abrirDialogBebidasDoPedido: boolean = false;
   public abrirDialogExclusaoPedido: boolean = false;
+  public abrirDialogFinalizarPedido: boolean = false; 
 
   public processandoOperacaoListagem: boolean = false;
   public processandoOperacaoInformacaoParaPedido: boolean = false;
@@ -45,6 +46,7 @@ export class PedidoComponent implements OnInit {
   public processandoAdicaoLanchePedido: boolean = false;
   public processandoAdicaoBebidaPedido: boolean = false;
   public processandoExclusaoPedido: boolean = false;
+  public processandoFinalizacaoPedido: boolean = false;
 
   constructor(
     private toastrService: ToastrService,
@@ -111,13 +113,10 @@ export class PedidoComponent implements OnInit {
     this.formularioPedido = new PedidoFORM();
   }
 
-  public resetarEscolhaMesa(): void {
-    this.formularioPedido.idMesa = null;
-  }
-
   public desabilitarBotaoCadastroPedido(): boolean {
     if (this.formularioPedido && this.formularioPedido.entrega) {
-      return (this.formularioPedido.entrega === 'S') ? true : !this.formularioPedido.idMesa;
+      return (this.formularioPedido.entrega === 'S') ? this.processandoCadastroPedido || !this.formularioPedido.idCliente
+        : this.processandoCadastroPedido || !this.formularioPedido.idMesa;
     }
     return true;
   }
@@ -240,6 +239,32 @@ export class PedidoComponent implements OnInit {
       });
   }
 
+  public armazenarPedidoParaFinalizacao(pedido: Pedido): void {
+    this.pedidoSelecionado = pedido;
+    this.abrirDialogFinalizarPedido = true;
+  }
+
+  public fecharDialogFinalizacaoPedido(): void {
+    this.abrirDialogFinalizarPedido = false;
+    this.pedidoSelecionado = new Pedido();
+  }
+
+  public finalizarPedido(): void {
+    this.processandoFinalizacaoPedido = true;
+
+    this.pedidoService.finalizarPedido(this.pedidoSelecionado.id)
+      .subscribe(() => {
+        this.processandoFinalizacaoPedido = false;
+        this.toastrService.success('Pedido finalizado com sucesso!');
+        this.fecharDialogFinalizacaoPedido();
+        this.buscarPedidos();
+      },
+      () => {
+        this.processandoFinalizacaoPedido = false;
+        this.toastrService.error('Erro ao finalizar o Pedido!');
+      });
+  }
+
   public eventoExclusaoBebidaDoPedido(bebidaExcluida: boolean): void {
     if (bebidaExcluida) {
       this.fecharDialogBebidasDoPedido();
@@ -252,5 +277,13 @@ export class PedidoComponent implements OnInit {
       this.fecharDialogLanchesDoPedido();
       this.buscarPedidos();
     }
+  }
+
+  public formatarData(data: Date): string {
+    if (data)  {
+      const dataString: string[] = data.toString().split('-');
+      return `${dataString[2]}/${dataString[1]}/${dataString[0]}`;
+    }
+    return '';
   }
 }

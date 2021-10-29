@@ -11,6 +11,7 @@ export class Pedido {
     dataHoraPedido: string;
     dataHoraEntrega: string;
     precoTotal: string;
+    pedidoFinalizado: string;
     mesa: Mesa = new Mesa();
     cliente: Cliente = new Cliente();
     lanches: PedidoLanche[] = [];
