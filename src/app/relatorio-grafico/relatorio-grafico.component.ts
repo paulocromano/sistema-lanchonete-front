@@ -6,6 +6,7 @@ import { RelatorioClienteService } from '../cliente/shared/service/relatorio-cli
 import { RelatorioFornecedorService } from '../fornecedor/shared/service/relatorio-fornecedor.service';
 import { RelatorioDespesaService } from '../despesa/shared/service/relatorio-despesa.service';
 import { RelatorioProdutoService } from '../produto/shared/service/relatorio-produto.service';
+import { RelatorioPedidoService } from '../pedido/shared/service/relatorio-pedido.service';
 import { DownloadRelatorioService } from './shared/service/download-relatorio.service';
 import { TipoRelatorio } from './shared/model/tipo-relatorio.enum';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -32,6 +33,7 @@ export class RelatorioGraficoComponent implements OnInit {
     private relatorioFornecedorService: RelatorioFornecedorService,
     private relatorioDespesaService: RelatorioDespesaService,
     private relatorioProdutoService: RelatorioProdutoService,
+    private relatorioPedidoService: RelatorioPedidoService,
     private downloadRelatorioService: DownloadRelatorioService
   ) { }
 
@@ -49,7 +51,8 @@ export class RelatorioGraficoComponent implements OnInit {
       { label: 'Despesas Pagas', value: TipoRelatorio.DESPESAS_PAGAS },
       { label: 'Despesas Vencidas', value: TipoRelatorio.DESPESAS_VENCIDAS },
       { label: 'Todos os Produtos', value: TipoRelatorio.TODOS_PRODUTOS },
-      { label: 'Produtos com Estoque Baixo', value: TipoRelatorio.PRODUTOS_ESTOQUE_BAIXO }
+      { label: 'Produtos com Estoque Baixo', value: TipoRelatorio.PRODUTOS_ESTOQUE_BAIXO },
+      { label: 'Todos os Pedidos', value: TipoRelatorio.TODOS_PEDIDOS }
       );
   }
 
@@ -107,6 +110,7 @@ export class RelatorioGraficoComponent implements OnInit {
       case TipoRelatorio.DESPESAS_VENCIDAS: { this.gerarRelatorioDespesasVencidas(); break; }
       case TipoRelatorio.TODOS_PRODUTOS: { this.gerarRelatorioComTodosProdutos(); break; }
       case TipoRelatorio.PRODUTOS_ESTOQUE_BAIXO: { this.gerarRelatorioComProdutosAbaixoDoEstoqueMinimo(); break; }
+      case TipoRelatorio.TODOS_PEDIDOS: { this.gerarRelatorioComTodosPedidos(); break; }
     }
   }
 
@@ -227,6 +231,21 @@ export class RelatorioGraficoComponent implements OnInit {
         this.processandoRelatorio = false;
         if (erro.status === 404) this.toastrService.warning('Nenhuma produto abaixo do estoque mínimo encontrado!');
         else this.toastrService.error('Erro ao gerar relatório dos produtos abaixo do estoque mínimo!');
+      });
+  }
+
+  private gerarRelatorioComTodosPedidos(): void {
+    this.processandoRelatorio = true;
+
+    this.relatorioPedidoService.gerarRelatorioComTodosPedidos()
+      .subscribe((response: any) => {
+        this.processandoRelatorio = false;
+        this.downloadRelatorioService.baixarRelatorio(response, 'pedidos.pdf');
+      },
+      (erro: HttpErrorResponse) => {
+        this.processandoRelatorio = false;
+        if (erro.status === 404) this.toastrService.warning('Nenhuma pedido encontrado!');
+        else this.toastrService.error('Erro ao gerar relatório dos pedidos!');
       });
   }
 }

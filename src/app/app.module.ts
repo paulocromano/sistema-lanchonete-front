@@ -17,7 +17,7 @@ import { DespesaModule } from './despesa/despesa.module';
 import { MesaModule } from './mesa/mesa.module';
 import { ProdutoModule } from './produto/produto.module';
 import { PedidoModule } from './pedido/pedido.module';
-
+import { PaginaInicialModule } from './pagina-inicial/pagina-inicial.module';
 
 const maskConfig: Partial<IConfig> = { validation: false }
 
@@ -28,6 +28,7 @@ const maskConfig: Partial<IConfig> = { validation: false }
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
+    PaginaInicialModule,
     HttpClientModule,
     AppRoutingModule,
     ClienteModule,
