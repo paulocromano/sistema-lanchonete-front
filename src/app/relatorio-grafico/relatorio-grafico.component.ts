@@ -3,8 +3,12 @@ import { ToastrService } from 'ngx-toastr';
 import { SelectItem } from 'primeng/api';
 
 import { RelatorioClienteService } from '../cliente/shared/service/relatorio-cliente.service';
+import { RelatorioFornecedorService } from '../fornecedor/shared/service/relatorio-fornecedor.service';
+import { RelatorioDespesaService } from '../despesa/shared/service/relatorio-despesa.service';
+import { RelatorioProdutoService } from '../produto/shared/service/relatorio-produto.service';
 import { DownloadRelatorioService } from './shared/service/download-relatorio.service';
 import { TipoRelatorio } from './shared/model/tipo-relatorio.enum';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-relatorio-grafico',
@@ -25,6 +29,9 @@ export class RelatorioGraficoComponent implements OnInit {
   constructor(
     private toastrService: ToastrService,
     private relatorioClienteService: RelatorioClienteService,
+    private relatorioFornecedorService: RelatorioFornecedorService,
+    private relatorioDespesaService: RelatorioDespesaService,
+    private relatorioProdutoService: RelatorioProdutoService,
     private downloadRelatorioService: DownloadRelatorioService
   ) { }
 
@@ -36,7 +43,13 @@ export class RelatorioGraficoComponent implements OnInit {
   private definirOpcoesRelatorioDropdown(): void {
     this.opcoesRelatorioDropdown.push(
       { label: 'Todos os Clientes', value: TipoRelatorio.TODOS_CLIENTES },
-      { label: 'Clientes por Período', value: TipoRelatorio.CLIENTES_POR_PERIODO }
+      { label: 'Clientes por Período', value: TipoRelatorio.CLIENTES_POR_PERIODO },
+      { label: 'Todos os Fornecedores', value: TipoRelatorio.TODOS_FORNECEDORES },
+      { label: 'Todas as Despesas', value: TipoRelatorio.TODAS_DESPESAS },
+      { label: 'Despesas Pagas', value: TipoRelatorio.DESPESAS_PAGAS },
+      { label: 'Despesas Vencidas', value: TipoRelatorio.DESPESAS_VENCIDAS },
+      { label: 'Todos os Produtos', value: TipoRelatorio.TODOS_PRODUTOS },
+      { label: 'Produtos com Estoque Baixo', value: TipoRelatorio.PRODUTOS_ESTOQUE_BAIXO }
       );
   }
 
@@ -88,10 +101,16 @@ export class RelatorioGraficoComponent implements OnInit {
     switch(this.tipoRelatorioSelecionado) {
       case TipoRelatorio.TODOS_CLIENTES: { this.gerarRelatorioComTodosClientes(); break; }
       case TipoRelatorio.CLIENTES_POR_PERIODO: { this.gerarRelatorioDeClientesCadastradosEntrePeriodos(); break; }
+      case TipoRelatorio.TODOS_FORNECEDORES: { this.gerarRelatorioComTodosFornecedores(); break; }
+      case TipoRelatorio.TODAS_DESPESAS: { this.gerarRelatorioTodasDespesas(); break; }
+      case TipoRelatorio.DESPESAS_PAGAS: { this.gerarRelatorioDespesasPagas(); break; }
+      case TipoRelatorio.DESPESAS_VENCIDAS: { this.gerarRelatorioDespesasVencidas(); break; }
+      case TipoRelatorio.TODOS_PRODUTOS: { this.gerarRelatorioComTodosProdutos(); break; }
+      case TipoRelatorio.PRODUTOS_ESTOQUE_BAIXO: { this.gerarRelatorioComProdutosAbaixoDoEstoqueMinimo(); break; }
     }
   }
 
-  public gerarRelatorioComTodosClientes(): void {
+  private gerarRelatorioComTodosClientes(): void {
     this.processandoRelatorio = true;
 
     this.relatorioClienteService.gerarRelatorioComTodosClientes()
@@ -99,23 +118,115 @@ export class RelatorioGraficoComponent implements OnInit {
         this.processandoRelatorio = false;
         this.downloadRelatorioService.baixarRelatorio(response, 'clientes.pdf');
       },
-      (e) => {
+      (erro: HttpErrorResponse) => {
         this.processandoRelatorio = false;
-        this.toastrService.error('Erro ao gerar relatório de todos os clientes!');
+        if (erro.status === 404) this.toastrService.warning('Nenhum cliente encontrado!');
+        else this.toastrService.error('Erro ao gerar relatório de todos os clientes!');
       });
   }
 
-  public gerarRelatorioDeClientesCadastradosEntrePeriodos(): void {
+  private gerarRelatorioDeClientesCadastradosEntrePeriodos(): void {
     this.processandoRelatorio = true;
-console.log(this.dataInicial)
+
     this.relatorioClienteService.gerarRelatorioDeClientesCadastradosEntrePeriodos(this.dataInicial, this.dataFinal)
       .subscribe((response: any) => {
         this.processandoRelatorio = false;
         this.downloadRelatorioService.baixarRelatorio(response, 'clientes.pdf');
       },
-      () => {
+      (erro: HttpErrorResponse) => {
         this.processandoRelatorio = false;
-        this.toastrService.error('Erro ao gerar relatório de clientes cadastrados entre período!');
+        if (erro.status === 404) this.toastrService.warning('Nenhum cliente encontrado no período especificado!');
+        else this.toastrService.error('Erro ao gerar relatório de clientes cadastrados entre período!');
+      });
+  }
+
+  private gerarRelatorioComTodosFornecedores(): void {
+    this.processandoRelatorio = true;
+
+    this.relatorioFornecedorService.gerarRelatorioComTodosFornecedores()
+      .subscribe((response: any) => {
+        this.processandoRelatorio = false;
+        this.downloadRelatorioService.baixarRelatorio(response, 'fornecedores.pdf');
+      },
+      (erro: HttpErrorResponse) => {
+        this.processandoRelatorio = false;
+        if (erro.status === 404) this.toastrService.warning('Nenhum fornecedor encontrado!');
+        else this.toastrService.error('Erro ao gerar relatório de todos os fornecedores!');
+      });
+  }
+
+  private gerarRelatorioTodasDespesas(): void {
+    this.processandoRelatorio = true;
+
+    this.relatorioDespesaService.gerarRelatorioTodasDespesas()
+      .subscribe((response: any) => {
+        this.processandoRelatorio = false;
+        this.downloadRelatorioService.baixarRelatorio(response, 'despesas.pdf');
+      },
+      (erro: HttpErrorResponse) => {
+        this.processandoRelatorio = false;
+        if (erro.status === 404) this.toastrService.warning('Nenhuma despesa encontrada!');
+        else this.toastrService.error('Erro ao gerar relatório de todas as despesas!');
+      });
+  }
+
+  private gerarRelatorioDespesasPagas(): void {
+    this.processandoRelatorio = true;
+
+    this.relatorioDespesaService.gerarRelatorioDespesasPagas()
+      .subscribe((response: any) => {
+        this.processandoRelatorio = false;
+        this.downloadRelatorioService.baixarRelatorio(response, 'despesas pagas.pdf');
+      },
+      (erro: HttpErrorResponse) => {
+        this.processandoRelatorio = false;
+        if (erro.status === 404) this.toastrService.warning('Nenhuma despesa paga encontrada!');
+        else this.toastrService.error('Erro ao gerar relatório das despesas pagas!');
+      });
+  }
+
+  private gerarRelatorioDespesasVencidas(): void {
+    this.processandoRelatorio = true;
+
+    this.relatorioDespesaService.gerarRelatorioDespesasVencidas()
+      .subscribe((response: any) => {
+        this.processandoRelatorio = false;
+        this.downloadRelatorioService.baixarRelatorio(response, 'despesas vencidas.pdf');
+      },
+      (erro: HttpErrorResponse) => {
+        this.processandoRelatorio = false;
+        if (erro.status === 404) this.toastrService.warning('Nenhuma despesa vencida encontrada!');
+        else this.toastrService.error('Erro ao gerar relatório das despesas vencidas!');
+      });
+  }
+
+  private gerarRelatorioComTodosProdutos(): void {
+    this.processandoRelatorio = true;
+
+    this.relatorioProdutoService.gerarRelatorioComTodosProdutos()
+      .subscribe((response: any) => {
+        this.processandoRelatorio = false;
+        this.downloadRelatorioService.baixarRelatorio(response, 'produtos.pdf');
+      },
+      (erro: HttpErrorResponse) => {
+        this.processandoRelatorio = false;
+        if (erro.status === 404) this.toastrService.warning('Nenhuma produto encontrado!');
+        else this.toastrService.error('Erro ao gerar relatório dos produtos!');
+      });
+  }
+
+  private gerarRelatorioComProdutosAbaixoDoEstoqueMinimo(): void {
+    this.processandoRelatorio = true;
+
+    this.relatorioProdutoService.gerarRelatorioComProdutosAbaixoDoEstoqueMinimo()
+      .subscribe((response: any) => {
+        this.processandoRelatorio = false;
+        this.downloadRelatorioService.baixarRelatorio(response, 'produtos.pdf');
+      },
+      (erro: HttpErrorResponse) => {
+        this.processandoRelatorio = false;
+        if (erro.status === 404) this.toastrService.warning('Nenhuma produto abaixo do estoque mínimo encontrado!');
+        else this.toastrService.error('Erro ao gerar relatório dos produtos abaixo do estoque mínimo!');
       });
   }
 }
