@@ -13,6 +13,7 @@ import { InputTextareaModule } from 'primeng/inputtextarea';
 import { InputNumberModule } from 'primeng/inputnumber';
 
 import { LancheComponent } from './lanche.component';
+import { DashboardModule } from '../dashboard/dashboard.module';
 
 const maskConfig: Partial<IConfig> = { validation: false }
 
@@ -28,6 +29,7 @@ const maskConfig: Partial<IConfig> = { validation: false }
     TooltipModule,
     InputTextareaModule,
     InputNumberModule,
+    DashboardModule,
     NgxMaskModule.forRoot(maskConfig)
   ]
 })

@@ -13,6 +13,7 @@ import { RadioButtonModule } from 'primeng/radiobutton';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 
 import { ProdutoComponent } from './produto.component';
+import { DashboardModule } from '../dashboard/dashboard.module';
 
 @NgModule({
   declarations: [ ProdutoComponent ],
@@ -27,7 +28,8 @@ import { ProdutoComponent } from './produto.component';
     InputNumberModule,
     DropdownModule,
     RadioButtonModule,
-    InputTextareaModule
+    InputTextareaModule,
+    DashboardModule
   ]
 })
 export class ProdutoModule { }

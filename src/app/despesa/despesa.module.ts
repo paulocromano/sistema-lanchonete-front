@@ -13,7 +13,7 @@ import { DropdownModule } from 'primeng/dropdown';
 import { IConfig, NgxMaskModule } from 'ngx-mask';
 
 import { DespesaComponent } from './despesa.component';
-
+import { DashboardModule } from '../dashboard/dashboard.module';
 
 const maskConfig: Partial<IConfig> = { validation: false }
 
@@ -29,6 +29,7 @@ const maskConfig: Partial<IConfig> = { validation: false }
     TooltipModule,
     CalendarModule,
     DropdownModule,
+    DashboardModule,
     NgxMaskModule.forRoot(maskConfig)
   ]
 })

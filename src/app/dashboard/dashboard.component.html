@@ -1,0 +1,46 @@
+<nav *ngIf="usuarioEstaLogado" class="navbar navbar-expand-lg navbar-dark bg-secondary">
+    <a class="navbar-brand" [routerLink]="['/inicio']">Início</a>
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" 
+        aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation"
+        (click)="show = !show">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" [ngClass]="{'show': show}" id="navbarText">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" [routerLink]="['/relatorios-graficos']">Relatórios & Gráficos</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" [routerLink]="['/pedidos']">Pedidos</a>
+            </li>
+            <li *ngIf="usuarioAdmin" class="nav-item">
+                <a class="nav-link" [routerLink]="['/fornecedores']">Fornecedores</a>
+            </li>
+            <li *ngIf="usuarioAdmin" class="nav-item">
+                <a class="nav-link" [routerLink]="['/despesas']">Despesas</a>
+            </li>
+        </ul>
+
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item mr-3">
+                <div class="dropdown">
+                    <button class="btn btn-secondary">
+                        <i class="far fa-user"></i>
+                        Olá, <b>{{ primeiroNomeUsuario }}</b>!
+                    </button>
+                    <div class="dropdown-content">
+                        <a *ngIf="usuarioAdmin" [routerLink]="['/colaboradores']">Colaboradores</a>
+                        <a (click)="abrirDialogUsuario()">Dados pessoais</a>
+                        <a (click)="efetuarLogout()">Logout</a>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<app-dados-pessoais-usuario *ngIf="usuarioEstaLogado" [exibirDialog]="exibirDialogInformacoesUsuario" 
+    (fecharDialog)="eventoFecharDialogInformacoesUsuario($event)" (usuarioAtualizado)="eventoUsuarioAtualizado($event)">
+</app-dados-pessoais-usuario>

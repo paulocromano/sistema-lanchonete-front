@@ -11,6 +11,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { IConfig, NgxMaskModule } from 'ngx-mask';
 
 import { ClienteComponent } from './cliente.component';
+import { DashboardModule } from '../dashboard/dashboard.module';
 
 const maskConfig: Partial<IConfig> = { validation: false }
 
@@ -24,6 +25,7 @@ const maskConfig: Partial<IConfig> = { validation: false }
     ProgressSpinnerModule,
     DialogModule,
     TooltipModule,
+    DashboardModule,
     NgxMaskModule.forRoot(maskConfig)
   ]
 })

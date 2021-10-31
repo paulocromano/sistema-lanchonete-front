@@ -15,6 +15,7 @@ import { InputTextareaModule } from 'primeng/inputtextarea';
 import { PedidoComponent } from './pedido.component';
 import { PedidoLancheComponent } from './pedido-lanche/pedido-lanche.component';
 import { PedidoBebidaComponent } from './pedido-bebida/pedido-bebida.component';
+import { DashboardModule } from '../dashboard/dashboard.module';
 
 @NgModule({
   declarations: [ 
@@ -33,7 +34,8 @@ import { PedidoBebidaComponent } from './pedido-bebida/pedido-bebida.component';
     DropdownModule,
     RadioButtonModule,
     InputNumberModule,
-    InputTextareaModule
+    InputTextareaModule,
+    DashboardModule
   ]
 })
 export class PedidoModule { }

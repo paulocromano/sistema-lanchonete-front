@@ -1,13 +1,15 @@
+<app-dashboard></app-dashboard>
+
 <div class="container-fluid text-center" style="margin-top: 20vh;">
     <div class="row">
-        <div class="col-12 col-md-6 mt-3">
+        <div class="col-12 col-md-6 mt-3" [routerLink]="['/clientes']">
             <button class="btn btn-primary">
                 <i class="fas fa-users"></i>
                 Clientes
             </button>
         </div>
         <div class="col-12 col-md-6 mt-3">
-            <button class="btn btn-warning text-white">
+            <button class="btn btn-warning text-white" [routerLink]="['/fornecedores']">
                 <i class="fas fa-truck-moving"></i>
                 Fornecedores
             </button>
@@ -16,10 +18,49 @@
 
     <div class="row">
         <div class="col-12 col-md-6 mt-4">
-
+            <button class="btn btn-secondary" [routerLink]="['/produtos']">
+                <i class="fas fa-shopping-basket"></i>
+                Produtos
+            </button>
         </div>
         <div class="col-12 col-md-6 mt-4">
+            <button class="btn btn-lanches" [routerLink]="['/lanches']">
+                <i class="fas fa-hamburger"></i>
+                Lanches
+            </button>
+        </div>
+    </div>
 
+    <div class="row">
+        <div class="col-12 col-md-6 mt-4">
+            <button class="btn btn-mesas" [routerLink]="['/mesas']">
+                <i class="fas fa-chair"></i>
+                Mesas
+            </button>
+        </div>
+        <div class="col-12 col-md-6 mt-4">
+            <button class="btn btn-danger" [routerLink]="['/despesas']">
+                <i class="fas fa-dollar-sign"></i>
+                Despesas
+            </button>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-12">
+            <button class="btn btn-success btn-largura" [routerLink]="['/pedidos']">
+                <i class="fas fa-clipboard-list"></i>
+                Pedidos
+            </button>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-12">
+            <button class="btn btn-relatorios btn-largura" [routerLink]="['/relatorios-graficos']">
+                <i class="far fa-clipboard"></i>
+                Relatórios
+            </button>
         </div>
     </div>
 </div>

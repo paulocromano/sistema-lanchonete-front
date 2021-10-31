@@ -7,6 +7,7 @@ import { DropdownModule } from 'primeng/dropdown';
 import { CalendarModule } from 'primeng/calendar';
 
 import { RelatorioGraficoComponent } from './relatorio-grafico.component';
+import { DashboardModule } from '../dashboard/dashboard.module';
 
 @NgModule({
   declarations: [ RelatorioGraficoComponent ],
@@ -15,7 +16,8 @@ import { RelatorioGraficoComponent } from './relatorio-grafico.component';
     FormsModule,
     InputTextModule,
     DropdownModule,
-    CalendarModule
+    CalendarModule,
+    DashboardModule
   ]
 })
 export class RelatorioGraficoModule { }

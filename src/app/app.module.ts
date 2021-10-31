@@ -8,6 +8,7 @@ import { AppComponent } from './app.component';
 import { ToastrModule } from 'ngx-toastr';
 
 import { IConfig, NgxMaskModule } from 'ngx-mask';
+import { JwtHelperService, JWT_OPTIONS } from '@auth0/angular-jwt';
 
 import { ClienteModule } from './cliente/cliente.module';
 import { FornecedorModule } from './fornecedor/fornecedor.module';
@@ -18,6 +19,13 @@ import { MesaModule } from './mesa/mesa.module';
 import { ProdutoModule } from './produto/produto.module';
 import { PedidoModule } from './pedido/pedido.module';
 import { PaginaInicialModule } from './pagina-inicial/pagina-inicial.module';
+import { DashboardModule } from './dashboard/dashboard.module';
+import { DadosPessoaisUsuarioModule } from './usuario/dados-pessoais-usuario/dados-pessoais-usuario.module';
+import { TabelaColaboradoresModule } from './usuario/tabela-colaboradores/tabela-colaboradores.module';
+import { InterceptorModule } from './interceptor/interceptor.module';
+import { LoginModule } from './login/login.module';
+import { LogadoGuard } from './shared/guard/logado.guard';
+import { AdminGuard } from './shared/guard/admin.guard';
 
 const maskConfig: Partial<IConfig> = { validation: false }
 
@@ -39,6 +47,11 @@ const maskConfig: Partial<IConfig> = { validation: false }
     MesaModule,
     ProdutoModule,
     PedidoModule,
+    DashboardModule,
+    DadosPessoaisUsuarioModule,
+    TabelaColaboradoresModule,
+    LoginModule,
+    InterceptorModule,
     ToastrModule.forRoot({
       timeOut: 4000,
       positionClass: 'toast-bottom-right',
@@ -47,7 +60,12 @@ const maskConfig: Partial<IConfig> = { validation: false }
     }),
     NgxMaskModule.forRoot(maskConfig)
   ],
-  providers: [],
+  providers: [
+    { provide: JWT_OPTIONS, useValue: JWT_OPTIONS },
+    JwtHelperService,
+    LogadoGuard,
+    AdminGuard
+   ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -2,3 +2,34 @@ button {
     white-space: normal;
     width: 24em;
 }
+
+.btn-lanches {
+    color: white;
+    background-color: rgb(243, 134, 62);
+}
+
+.btn-lanches:hover {
+    background-color: rgb(199, 108, 33);
+}
+
+.btn-mesas {
+    color: white;
+    background-color: rgb(163, 119, 52);
+}
+
+.btn-mesas:hover {
+    background-color: rgb(141, 102, 43);
+}
+
+.btn-largura {
+    width: 50vw;
+}
+
+.btn-relatorios {
+    color: white;
+    background-color: rgb(125, 62, 241);
+}
+
+.btn-relatorios:hover {
+    background-color: rgb(106, 53, 204);
+}
